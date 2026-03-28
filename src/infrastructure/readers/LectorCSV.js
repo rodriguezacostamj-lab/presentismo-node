@@ -82,16 +82,22 @@ class LectorCSV {
     }
 
     #parsearCSV(rutaArchivo) {
-        return new Promise((resolve, reject) => {
-            const registros = []
+    return new Promise((resolve, reject) => {
+        const registros = []
 
-            fs.createReadStream(rutaArchivo)
-                .pipe(parse({ columns: true, trim: true }))
-                .on('data', fila => registros.push(fila))
-                .on('end',  ()   => resolve(registros))
-                .on('error', err => reject(err))
-        })
-    }
+        fs.createReadStream(rutaArchivo, { encoding: 'utf8' })
+            .pipe(parse({
+                columns:        true,
+                trim:           true,
+                delimiter:      ',',
+                quote:          '"',
+                relax_quotes:   true
+            }))
+            .on('data',  fila => registros.push(fila))
+            .on('end',   ()   => resolve(registros))
+            .on('error', err  => reject(err))
+    })
+}
 }
 
 module.exports = LectorCSV
