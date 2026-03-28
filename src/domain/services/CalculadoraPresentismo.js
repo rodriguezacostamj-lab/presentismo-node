@@ -1,4 +1,5 @@
 const Ausencia = require('../entities/Ausencia')
+const Periodo = require('../entities/Periodo')
 
 class CalculadoraPresentismo {
 

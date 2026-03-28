@@ -2,6 +2,7 @@ const CalcularPresentismoUseCase = require('../../application/CalcularPresentism
 const ReglaRepository = require('../../infrastructure/persistence/ReglaRepository')
 const SQLiteConnection = require('../../infrastructure/persistence/SQLiteConnection')
 const path = require('path')
+const fs = require('fs')
 
 class PresentismoController {
 
@@ -33,10 +34,14 @@ class PresentismoController {
             }
 
             // Ruta del archivo de sueldos (opcional)
-            const rutaSueldos = req.files?.sueldos
-                ? req.files.sueldos.tempFilePath
-                : null
-
+           let rutaSueldos = null
+if (req.files?.sueldos) {
+    const archivoSueldos = req.files.sueldos
+    const extSueldos = path.extname(archivoSueldos.name).toLowerCase()
+    const tempPath = archivoSueldos.tempFilePath + extSueldos
+    fs.renameSync(archivoSueldos.tempFilePath, tempPath)
+    rutaSueldos = tempPath
+}
             // Conectar DB y ejecutar caso de uso
             const db   = new SQLiteConnection(path.resolve('data/presentismo.db'))
             const repo = new ReglaRepository(db)
