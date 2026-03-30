@@ -1,51 +1,47 @@
-let gridApi = null
+let tabla = null
 
-// Inicializar AG Grid
-function inicializarGrid() {
-    const columnDefs = [
-        { field: 'cuil',             headerName: 'CUIL',              width: 130 },
-        { field: 'nombre',           headerName: 'NOMBRE',            flex: 1, minWidth: 200 },
-        { field: 'diasDescontables', headerName: 'DÍAS DESCONTABLES', width: 160, type: 'numericColumn' },
-        { field: 'porcentaje',       headerName: '%',                 width: 80,
-            cellRenderer: p => `<strong>${p.value}%</strong>` },
-        { field: 'alertas',          headerName: 'ALERTAS',           width: 120,
-            cellRenderer: p => {
-                let badges = ''
-                if (p.data.funcionEjecutiva) badges += '<span class="badge-fe">FE</span> '
-                if (p.data.cargoMayor)       badges += '<span class="badge-cmj">CMJ</span>'
-                return badges || '—'
-            }
+// Inicializar DataTable
+function inicializarTabla() {
+    tabla = $('#tabla-resultados').DataTable({
+        data: [],
+        columns: [
+            { data: 'cuil' },
+            { data: 'nombre' },
+            { data: 'diasDescontables', className: 'text-center' },
+            { data: 'porcentaje', className: 'text-center',
+                render: d => `<strong>${d}%</strong>` },
+            { data: null, className: 'text-center',
+                render: (d, t, r) => {
+                    let badges = ''
+                    if (r.funcionEjecutiva) badges += '<span class="badge-fe">FE</span> '
+                    if (r.cargoMayor)       badges += '<span class="badge-cmj">CMJ</span>'
+                    return badges || '—'
+                }
+            },
+            { data: 'importeRrhh',
+                render: d => d != null ? `$${Number(d).toLocaleString('es-AR')}` : '—' },
+            { data: 'importeEsperado',
+                render: d => d != null ? `$${Number(d).toLocaleString('es-AR')}` : '—' },
+            { data: 'estado', className: 'text-center',
+                render: d => {
+                    if (d === 'OK')          return '<span class="badge-ok">OK</span>'
+                    if (d === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
+                    return '—'
+                }
+            },
+            { data: 'cuil', className: 'text-center',
+                render: d => `<button class="btn-ver" onclick="verDetalle('${d}')">Ver más</button>` }
+        ],
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
         },
-        { field: 'importeRrhh',      headerName: '$ RRHH',            width: 130,
-            cellRenderer: p => p.value != null ? `$${p.value.toLocaleString('es-AR')}` : '—' },
-        { field: 'importeEsperado',  headerName: '$ SUELDOS',         width: 130,
-            cellRenderer: p => p.value != null ? `$${p.value.toLocaleString('es-AR')}` : '—' },
-        { field: 'estado',           headerName: 'ESTADO',            width: 110,
-            cellRenderer: p => {
-                if (p.value === 'OK')          return '<span class="badge-ok">OK</span>'
-                if (p.value === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
-                return '—'
-            }
-        },
-        { headerName: 'ACCIÓN', width: 110,
-            cellRenderer: p => `<button onclick="verDetalle('${p.data.cuil}')" style="background:none;border:1px solid #adb5bd;color:#6c757d;padding:2px 10px;border-radius:4px;font-size:0.75rem;cursor:pointer;font-family:inherit">Ver más</button>`
-        }
-    ]
-
-    const gridOptions = {
-        columnDefs,
-        rowData: [],
-        defaultColDef: {
-            sortable:   true,
-            filter:     true,
-            resizable:  true,
-        },
-        pagination:         true,
-        paginationPageSize: 20,
-    }
-
-    const container = document.getElementById('grid-resultados')
-    gridApi = agGrid.createGrid(container, gridOptions)
+        pageLength: 20,
+        dom: '<"d-flex justify-content-between mb-2"Bf>rtip',
+        buttons: [
+            { extend: 'excel', text: '📥 Excel', className: 'btn btn-sm btn-outline-success' },
+            { extend: 'print', text: '🖨️ Imprimir', className: 'btn btn-sm btn-outline-secondary' }
+        ]
+    })
 }
 
 // Calcular
@@ -58,16 +54,14 @@ async function calcular() {
     }
 
     const formData = new FormData()
-    formData.append('ausencias',   archivoAusencias)
-    formData.append('desde_liq',   document.getElementById('desde_liq').value)
-    formData.append('hasta_liq',   document.getElementById('hasta_liq').value)
-    formData.append('desde_pres',  document.getElementById('desde_pres').value)
-    formData.append('hasta_pres',  document.getElementById('hasta_pres').value)
+    formData.append('ausencias',  archivoAusencias)
+    formData.append('desde_liq',  document.getElementById('desde_liq').value)
+    formData.append('hasta_liq',  document.getElementById('hasta_liq').value)
+    formData.append('desde_pres', document.getElementById('desde_pres').value)
+    formData.append('hasta_pres', document.getElementById('hasta_pres').value)
 
     const archivoSueldos = document.getElementById('archivo-sueldos').files[0]
-    if (archivoSueldos) {
-        formData.append('sueldos', archivoSueldos)
-    }
+    if (archivoSueldos) formData.append('sueldos', archivoSueldos)
 
     try {
         const btn = document.querySelector('button[onclick="calcular()"]')
@@ -86,7 +80,6 @@ async function calcular() {
             return
         }
 
-        // Transformar datos para AG Grid
         const filas = data.resultados.map(r => ({
             cuil:             r.empleado.cuil,
             nombre:           r.empleado.nombre,
@@ -100,7 +93,7 @@ async function calcular() {
             detalle:          r.resultado
         }))
 
-        gridApi.setGridOption('rowData', filas)
+        tabla.clear().rows.add(filas).draw()
 
     } catch (error) {
         alert('Error al conectar con el servidor: ' + error.message)
@@ -118,25 +111,18 @@ function verDetalle(cuil) {
 
 // Limpiar
 function limpiar() {
-    gridApi.setGridOption('rowData', [])
+    tabla.clear().draw()
     document.getElementById('archivo-ausencias').value = ''
     document.getElementById('archivo-sueldos').value = ''
 }
 
 // Mostrar sección
-function mostrarSeccion(seccion) {
+function mostrarSeccion(seccion, el) {
     document.getElementById('seccion-presentismo').style.display = seccion === 'presentismo' ? 'block' : 'none'
     document.getElementById('seccion-reglas').style.display      = seccion === 'reglas'      ? 'block' : 'none'
-
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'))
-    event.target.classList.add('active')
+    el.classList.add('active')
 }
 
 // Inicializar al cargar
-
-document.addEventListener('DOMContentLoaded', () => {
-    inicializarGrid()
-    document.getElementById('buscador').addEventListener('input', e => {
-        gridApi.setGridOption('quickFilterText', e.target.value)
-    })
-})
+$(document).ready(() => inicializarTabla())

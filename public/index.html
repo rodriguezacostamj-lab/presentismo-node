@@ -5,87 +5,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Presentismo</title>
 
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- AG Grid -->
-    <link href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-balham.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- DataTables Buttons -->
+    <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet">
+
     <style>
-        /* Fuente profesional */
-body {
-    font-family: 'Inter', 'Segoe UI', sans-serif;
-}
-
-/* Filas alternas en AG Grid */
-.ag-theme-balham .ag-row-even {
-    background-color: #f8f9fa;
-}
-.ag-theme-balham .ag-row-odd {
-    background-color: #ffffff;
-}
-
-/* Hover en filas */
-.ag-theme-balham .ag-row:hover {
-    background-color: #e8f0fe !important;
-}
-
-/* Header más prolijo */
-.ag-theme-balham .ag-header {
-    background-color: #1a2035;
-    color: white;
-}
-.ag-theme-balham .ag-header-cell-text {
-    color: white;
-    font-weight: 600;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-}
-        body { background-color: #f8f9fa; }
-        .sidebar {
-            width: 220px;
-            min-height: 100vh;
-            background-color: #1a2035;
-            position: fixed;
-            top: 0; left: 0;
-        }
-        .sidebar .nav-link {
-            color: #adb5bd;
-            padding: 12px 20px;
-        }
-        .sidebar .nav-link.active {
-            color: #fff;
-            background-color: #0d6efd;
-            border-radius: 6px;
-            margin: 0 10px;
-        }
-        .sidebar .logo {
-            color: #fff;
-            font-weight: bold;
-            padding: 20px;
-            font-size: 1rem;
-            border-bottom: 1px solid #2d3a5a;
-        }
-        .main-content {
-            margin-left: 220px;
-            padding: 30px;
-        }
-        .page-title {
-            background: linear-gradient(135deg, #1a2035, #2d3a5a);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            margin-bottom: 25px;
-        }
-        #grid-resultados {
-            height: 500px;
-        }
-        .badge-ok       { background-color: #198754; color: white; padding: 4px 10px; border-radius: 20px; }
-        .badge-revisar  { background-color: #ffc107; color: black; padding: 4px 10px; border-radius: 20px; }
-        .badge-fe       { background-color: #dc3545; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; }
-        .badge-cmj      { background-color: #6f42c1; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; }
-    </style>
+    body {
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        background-color: #f8f9fa;
+        font-size: 0.82rem;
+    }
+    .sidebar {
+        width: 200px;
+        min-height: 100vh;
+        background-color: #1a2035;
+        position: fixed;
+        top: 0; left: 0;
+    }
+    .sidebar .nav-link {
+        color: #adb5bd;
+        padding: 10px 20px;
+        font-size: 0.82rem;
+    }
+    .sidebar .nav-link.active {
+        color: #fff;
+        background-color: #0d6efd;
+        border-radius: 6px;
+        margin: 0 10px;
+    }
+    .sidebar .logo {
+        color: #fff;
+        font-weight: bold;
+        padding: 18px 20px;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #2d3a5a;
+    }
+    .main-content {
+        margin-left: 200px;
+        padding: 20px 25px;
+    }
+    .page-title {
+        background: linear-gradient(135deg, #1a2035, #2d3a5a);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 0.85rem;
+    }
+    .badge-ok      { background-color: #198754; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
+    .badge-revisar { background-color: #ffc107; color: black; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
+    .badge-fe      { background-color: #dc3545; color: white; padding: 2px 7px; border-radius: 20px; font-size: 0.65rem; }
+    .badge-cmj     { background-color: #6f42c1; color: white; padding: 2px 7px; border-radius: 20px; font-size: 0.65rem; }
+    .btn-ver {
+        background-color: #0d6efd;
+        border: none;
+        color: white;
+        padding: 2px 10px;
+        border-radius: 4px;
+        font-size: 0.72rem;
+        cursor: pointer;
+    }
+    .btn-ver:hover { background-color: #0b5ed7; }
+    table.dataTable tbody tr { font-size: 0.78rem; }
+    table.dataTable tbody tr:hover { background-color: #e8f0fe !important; }
+    table.dataTable tbody td { white-space: nowrap; padding: 5px 10px !important; vertical-align: middle !important; }
+    table.dataTable thead th { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; padding: 8px 10px !important; }
+    .dataTables_wrapper .dataTables_filter input { font-size: 0.8rem; }
+    .dataTables_wrapper .dataTables_length select { font-size: 0.8rem; }
+    .dataTables_wrapper .dataTables_info { font-size: 0.75rem; }
+    .dataTables_wrapper .dataTables_paginate { font-size: 0.8rem; }
+    .dt-buttons .btn { font-size: 0.75rem; padding: 3px 8px; }
+    .card { border: none; box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important; }
+    .card-title { font-size: 0.82rem; font-weight: 600; }
+    .form-label { font-size: 0.75rem; }
+    .form-control { font-size: 0.82rem; }
+</style>
 </head>
 <body>
 
@@ -93,10 +92,10 @@ body {
 <div class="sidebar d-flex flex-column">
     <div class="logo">⚡ Presentismo</div>
     <nav class="nav flex-column mt-3">
-        <a href="#" class="nav-link active" onclick="mostrarSeccion('presentismo')">
+        <a href="#" class="nav-link active" onclick="mostrarSeccion('presentismo', this)">
             👥 Presentismo
         </a>
-        <a href="#" class="nav-link" onclick="mostrarSeccion('reglas')">
+        <a href="#" class="nav-link" onclick="mostrarSeccion('reglas', this)">
             ⚙️ Reglas de Ausencias
         </a>
     </nav>
@@ -171,17 +170,30 @@ body {
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h6 class="card-title mb-0">👥 LISTADO DE AGENTES</h6>
-    <div class="d-flex gap-2">
-        <input type="text" id="buscador" class="form-control form-control-sm" placeholder="Buscar..." style="width: 200px">
-        <button class="btn btn-sm btn-outline-secondary" onclick="limpiar()">Limpiar cálculo</button>
-    </div>
-    </div>
-                <div id="grid-resultados" class="ag-theme-balham"></div>
+                    <h6 class="card-title mb-0">👥 LISTADO DE AGENTES</h6>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="limpiar()">Limpiar cálculo</button>
+                </div>
+                <table id="tabla-resultados" class="table table-hover table-sm w-100">
+                    <thead>
+                        <tr>
+                            <th>CUIL</th>
+                            <th>NOMBRE</th>
+                            <th>DÍAS DESC.</th>
+                            <th>%</th>
+                            <th>ALERTAS</th>
+                            <th>$ RRHH</th>
+                            <th>$ SUELDOS</th>
+                            <th>ESTADO</th>
+                            <th>ACCIÓN</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
     </div>
-    <!-- SECCIÓN REGLAS (placeholder) -->
+
+    <!-- SECCIÓN REGLAS -->
     <div id="seccion-reglas" style="display:none">
         <div class="page-title">
             <h5 class="mb-0">⚙️ REGLAS DE AUSENCIAS</h5>
@@ -196,8 +208,15 @@ body {
 </div>
 
 <!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/dist/ag-grid-community.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 <script src="presentismo.js"></script>
 
 </body>
