@@ -28,7 +28,7 @@ function inicializarGrid() {
             }
         },
         { headerName: 'ACCIÓN', width: 110,
-            cellRenderer: p => `<button class="btn btn-sm btn-outline-primary" onclick="verDetalle('${p.data.cuil}')">Ver más</button>`
+            cellRenderer: p => `<button onclick="verDetalle('${p.data.cuil}')" style="background:none;border:1px solid #adb5bd;color:#6c757d;padding:2px 10px;border-radius:4px;font-size:0.75rem;cursor:pointer;font-family:inherit">Ver más</button>`
         }
     ]
 

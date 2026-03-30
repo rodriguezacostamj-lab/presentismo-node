@@ -10,8 +10,38 @@
     <!-- AG Grid -->
     <link href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-grid.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.0/styles/ag-theme-balham.css" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
     <style>
+        /* Fuente profesional */
+body {
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+/* Filas alternas en AG Grid */
+.ag-theme-balham .ag-row-even {
+    background-color: #f8f9fa;
+}
+.ag-theme-balham .ag-row-odd {
+    background-color: #ffffff;
+}
+
+/* Hover en filas */
+.ag-theme-balham .ag-row:hover {
+    background-color: #e8f0fe !important;
+}
+
+/* Header más prolijo */
+.ag-theme-balham .ag-header {
+    background-color: #1a2035;
+    color: white;
+}
+.ag-theme-balham .ag-header-cell-text {
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
         body { background-color: #f8f9fa; }
         .sidebar {
             width: 220px;
