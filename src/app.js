@@ -5,6 +5,7 @@ const presentismoRoutes = require('./interfaces/routes/presentismo.routes')
 
 const app = express()
 
+
 // Middlewares
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -12,6 +13,8 @@ app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: path.resolve('uploads/')
 }))
+
+app.use(express.static(path.resolve('public')))
 
 // Rutas
 app.use('/api/presentismo', presentismoRoutes)
