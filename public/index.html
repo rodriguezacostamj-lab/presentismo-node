@@ -18,7 +18,7 @@
     body {
         font-family: 'Inter', 'Segoe UI', sans-serif;
         background-color: #f8f9fa;
-        font-size: 0.82rem;
+        font-size: 0.95rem;
     }
     .sidebar {
         width: 200px;
@@ -30,7 +30,7 @@
     .sidebar .nav-link {
         color: #adb5bd;
         padding: 10px 20px;
-        font-size: 0.82rem;
+        font-size: 0.86rem;
     }
     .sidebar .nav-link.active {
         color: #fff;
@@ -67,22 +67,26 @@
         color: white;
         padding: 2px 10px;
         border-radius: 4px;
-        font-size: 0.72rem;
+        font-size: 0.85rem;
         cursor: pointer;
     }
     .btn-ver:hover { background-color: #0b5ed7; }
-    table.dataTable tbody tr { font-size: 0.78rem; }
+    table.dataTable tbody tr { font-size: 0.85rem; }
     table.dataTable tbody tr:hover { background-color: #e8f0fe !important; }
     table.dataTable tbody td { white-space: nowrap; padding: 5px 10px !important; vertical-align: middle !important; }
-    table.dataTable thead th { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; padding: 8px 10px !important; }
+    table.dataTable thead th { font-size: 0.80rem; font-weight: 600; letter-spacing: 0.04em; padding: 8px 10px !important; }
     .dataTables_wrapper .dataTables_filter input { font-size: 0.8rem; }
     .dataTables_wrapper .dataTables_length select { font-size: 0.8rem; }
     .dataTables_wrapper .dataTables_info { font-size: 0.75rem; }
     .dataTables_wrapper .dataTables_paginate { font-size: 0.8rem; }
-    .dt-buttons .btn { font-size: 0.75rem; padding: 3px 8px; }
+    .dt-buttons {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    }
     .card { border: none; box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important; }
-    .card-title { font-size: 0.82rem; font-weight: 600; }
-    .form-label { font-size: 0.75rem; }
+    .card-title { font-size: 0.95rem; font-weight: 600; }
+    .form-label { font-size: 0.82rem; }
     .form-control { font-size: 0.82rem; }
 </style>
 </head>
@@ -158,8 +162,8 @@
                             <label class="form-label small">Sueldos (opcional)</label>
                             <input type="file" id="archivo-sueldos" class="form-control" accept=".csv,.xlsx,.xls">
                         </div>
-                        <button class="btn btn-dark mt-auto w-100" onclick="calcular()">
-                            Calcular
+                        <button class="btn mt-auto w-100" onclick="calcular()" style="background-color:#0b1738;color:white;font-size:0.82rem;">
+                         Calcular
                         </button>
                     </div>
                 </div>

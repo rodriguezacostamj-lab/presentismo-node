@@ -38,9 +38,28 @@ function inicializarTabla() {
         pageLength: 20,
         dom: '<"d-flex justify-content-between mb-2"Bf>rtip',
         buttons: [
-            { extend: 'excel', text: '📥 Excel', className: 'btn btn-sm btn-outline-success' },
-            { extend: 'print', text: '🖨️ Imprimir', className: 'btn btn-sm btn-outline-secondary' }
-        ]
+    { 
+        extend: 'excel', 
+        text: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/></svg>', 
+        titleAttr: 'Excel', 
+        className: 'btn btn-sm',
+        attr: { style: 'background-color:#0b1738;color:white;padding:5px 8px;border:none;border-radius:4px;' }
+    },
+    { 
+        extend: 'pdf',   
+        text: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/></svg>', 
+        titleAttr: 'PDF', 
+        className: 'btn btn-sm',
+        attr: { style: 'background-color:#0b1738;color:white;padding:5px 8px;border:none;border-radius:4px;' }
+    },
+    { 
+        extend: 'print', 
+        text: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/><path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/></svg>', 
+        titleAttr: 'Imprimir', 
+        className: 'btn btn-sm',
+        attr: { style: 'background-color:#0b1738;color:white;padding:5px 8px;border:none;border-radius:4px;' }
+    }
+],
     })
 }
 
