@@ -7,7 +7,8 @@ class Ausencia {
         nivel = null,
         vinculo = null,
         edad = null,
-        discapacidad = false
+        discapacidad = false,
+        causal = null
     }) {
         this.codigo = codigo
         this.dias = dias
@@ -17,6 +18,7 @@ class Ausencia {
         this.vinculo = vinculo
         this.edad = edad
         this.discapacidad = discapacidad
+        this.causal = causal
     }
 }
 

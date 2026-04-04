@@ -21,8 +21,8 @@ class CalcularPresentismoUseCase {
         hastaPres
     }) {
         // 1. Cargar reglas desde la DB
-        const reglas   = await this.repositorioReglas.obtenerTodas()
-        const tipos    = reglas.map(r => new TipoAusencia(r))
+        const reglas = await this.repositorioReglas.obtenerTodas()
+        const tipos = reglas.map(r => new TipoAusencia(r))
         const catalogo = new CatalogoTipoDeAusencia(tipos)
 
         // 2. Leer valor base del presentismo
@@ -45,20 +45,28 @@ class CalcularPresentismoUseCase {
         const periodoPresentismo = new Periodo(desdePres, hastaPres)
 
         // 5. Calcular y comparar
-        const calc       = new CalculadoraPresentismo(catalogo)
+        const calc = new CalculadoraPresentismo(catalogo)
         const comparador = new ComparadorPremio()
         const resultados = []
 
         for (const emp of empleados) {
             const resultado = calc.analizar(emp, periodoLiquidacion, periodoPresentismo)
 
-            const cuil       = emp.cuil
+            emp.obtenerAusencias().forEach(a => {
+                console.log('nivel:', a.nivel, '| causal:', a.causal, '| fechaDesde:', a.fechaDesde, '| fechaHasta:', a.fechaHasta)
+            })
+            const cuil = emp.cuil
             const infoSueldo = sueldosPorCuil[cuil] ?? null
             const porcentaje = resultado.porcentaje ?? 0
 
             // Detectar cargo mayor jerarquía
             const tieneCargoMayor = emp.obtenerAusencias().some(a =>
-                (a.nivel ?? '').toUpperCase().includes('CARGO DE MAYOR JERARQUIA')
+                (
+                    (a.causal ?? '').toUpperCase().includes('CARGO MAYOR JERARQUIA') ||
+                    (a.nivel ?? '').toUpperCase().includes('CARGO DE MAYOR JERARQUIA')
+                ) &&
+                a.fechaDesde <= periodoLiquidacion.hasta &&
+                a.fechaHasta >= periodoLiquidacion.desde
             )
 
             const tieneAlertaEspecial = tieneCargoMayor || emp.tieneFuncionEjecutiva()
@@ -76,18 +84,18 @@ class CalcularPresentismoUseCase {
             resultados.push({
                 empleado: {
                     cuil,
-                    nombre:           emp.nombre,
+                    nombre: emp.nombre,
                     funcionEjecutiva: emp.tieneFuncionEjecutiva(),
-                    cargoMayor:       tieneCargoMayor
+                    cargoMayor: tieneCargoMayor
                 },
                 resultado,
                 premio: {
-                    estado:           estadoPremio,
+                    estado: estadoPremio,
                     importe_esperado: importeEsperado,
-                    importe_rrhh:     infoSueldo?.importe_rrhh ?? null
+                    importe_rrhh: infoSueldo?.importe_rrhh ?? null
                 },
                 alertas: {
-                    cargo_mayor:       tieneCargoMayor,
+                    cargo_mayor: tieneCargoMayor,
                     funcion_ejecutiva: emp.tieneFuncionEjecutiva()
                 }
             })
@@ -95,6 +103,8 @@ class CalcularPresentismoUseCase {
 
         return resultados
     }
+
 }
+
 
 module.exports = CalcularPresentismoUseCase

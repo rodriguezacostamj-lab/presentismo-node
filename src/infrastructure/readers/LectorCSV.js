@@ -14,9 +14,10 @@ class LectorCSV {
             // Ignorar filas de encabezado repetidas
             if (fila['CUIL'] === 'CUIL') continue
 
-            const cuil           = fila['CUIL']?.trim()
-            const nombre         = fila['NOMBRE']?.trim()
+            const cuil = fila['CUIL']?.trim()
+            const nombre = fila['NOMBRE']?.trim()
             const funcionEjecutiva = fila['FUNC. EJECUTIVA']?.trim()
+
 
             if (!cuil) continue
 
@@ -37,13 +38,14 @@ class LectorCSV {
 
             const ausencia = new Ausencia({
                 codigo,
-                dias:         0, // se calcula en CalculadoraPresentismo
+                dias: 0, // se calcula en CalculadoraPresentismo
                 fechaDesde,
                 fechaHasta,
-                nivel:        fila['AUSENCIA']?.trim() ?? null,
-                vinculo:      fila['VINCULO']?.trim() ?? null,
-                edad:         fila['EDAD'] ? parseInt(fila['EDAD']) : null,
+                nivel: fila['AUSENCIA']?.trim() ?? null,
+                vinculo: fila['VINCULO']?.trim() ?? null,
+                edad: fila['EDAD'] ? parseInt(fila['EDAD']) : null,
                 discapacidad: fila['DISC'] !== 'null' && fila['DISC'] !== null,
+                causal: fila['CAUSAL']?.trim() ?? null,
             })
 
             empleadosPorCuil[cuil].agregarAusencia(ausencia)
@@ -60,7 +62,8 @@ class LectorCSV {
             if (!causal) return null
             const causalUpper = causal.toUpperCase()
             if (causalUpper.includes('INJUSTIFICADA')) return 'INJ'
-            if (causalUpper.includes('HUELGA'))        return 'HUE'
+            if (causalUpper.includes('HUELGA')) return 'HUE'
+            if (causalUpper.includes('CARGO MAYOR')) return 'CMJ'  // ← agregá esta línea
             return null
         }
 
@@ -82,22 +85,24 @@ class LectorCSV {
     }
 
     #parsearCSV(rutaArchivo) {
-    return new Promise((resolve, reject) => {
-        const registros = []
+        return new Promise((resolve, reject) => {
+            const registros = []
 
-        fs.createReadStream(rutaArchivo, { encoding: 'utf8' })
-            .pipe(parse({
-                columns:        true,
-                trim:           true,
-                delimiter:      ',',
-                quote:          '"',
-                relax_quotes:   true
-            }))
-            .on('data',  fila => registros.push(fila))
-            .on('end',   ()   => resolve(registros))
-            .on('error', err  => reject(err))
-    })
-}
+            fs.createReadStream(rutaArchivo, { encoding: 'utf8' })
+                .pipe(parse({
+                    columns: true,
+                    trim: true,
+                    delimiter: ',',
+                    quote: '"',
+                    relax_quotes: true,
+                    skip_records_with_error: true
+                }))
+                .on('data', fila => registros.push(fila))
+                .on('end', () => resolve(registros))
+                .on('error', err => reject(err))
+                .on('skip', err => console.log('Fila saltada:', err.message))
+        })
+    }
 }
 
 module.exports = LectorCSV

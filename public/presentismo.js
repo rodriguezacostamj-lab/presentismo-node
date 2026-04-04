@@ -119,7 +119,7 @@ async function calcular() {
         }
 
         const filas = data.resultados.map(r => {
-            resultadosCache[r.empleado.cuil] = r  // ← solo esta línea nueva
+            resultadosCache[r.empleado.cuil] = r  
             return {
                 cuil: r.empleado.cuil,
                 nombre: r.empleado.nombre,
