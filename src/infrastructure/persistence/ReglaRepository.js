@@ -27,6 +27,13 @@ class ReglaRepository {
     async eliminarRegla(codigo) {
         return this.db.eliminarRegla(codigo)
     }
+    async obtenerEspecial(codigo) {
+        return this.db.obtenerEspecial(codigo)
+    }
+
+    async guardarEspecial(codigo, bloques) {
+        return this.db.guardarEspecial(codigo, bloques)
+    }
 }
 
 module.exports = ReglaRepository

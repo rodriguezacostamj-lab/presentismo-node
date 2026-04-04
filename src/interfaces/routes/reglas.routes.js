@@ -10,5 +10,7 @@ router.get('/', (req, res) => controller.obtenerReglas(req, res))
 router.patch('/:codigo', (req, res) => controller.actualizarRegla(req, res))
 router.post('/', (req, res) => controller.crearRegla(req, res))
 router.delete('/:codigo', (req, res) => controller.eliminarRegla(req, res))
+router.get('/:codigo/especial', (req, res) => controller.obtenerEspecial(req, res))
+router.put('/:codigo/especial', (req, res) => controller.guardarEspecial(req, res))
 
 module.exports = router

@@ -111,6 +111,44 @@ class ReglasController {
             return res.status(500).json({ error: error.message })
         }
     }
+    async obtenerEspecial(req, res) {
+        try {
+            const { codigo } = req.params
+
+            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const repo = new ReglaRepository(db)
+
+            const especial = await repo.obtenerEspecial(codigo)
+            db.cerrar()
+
+            return res.json({ codigo, especial })
+
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
+
+    async guardarEspecial(req, res) {
+        try {
+            const { codigo } = req.params
+            const { bloques } = req.body
+
+            if (!Array.isArray(bloques)) {
+                return res.status(400).json({ error: 'bloques debe ser un array.' })
+            }
+
+            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const repo = new ReglaRepository(db)
+
+            await repo.guardarEspecial(codigo, bloques)
+            db.cerrar()
+
+            return res.json({ mensaje: 'Regla especial guardada correctamente.' })
+
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
 }
 
 module.exports = ReglasController

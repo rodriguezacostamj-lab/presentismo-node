@@ -75,6 +75,40 @@ class SQLiteConnection {
         DELETE FROM reglas_ausencias WHERE codigo = ?
     `).run(codigo)
     }
+    obtenerEspecial(codigo) {
+        const row = this.db.prepare(`
+        SELECT parametros, tipo, activa
+        FROM reglas_especiales
+        WHERE codigo = ?
+    `).get(codigo)
+
+        if (!row) return null
+
+        return {
+            tipo: row.tipo,
+            activa: row.activa === 1,
+            bloques: JSON.parse(row.parametros ?? '[]')
+        }
+    }
+
+    guardarEspecial(codigo, bloques) {
+        const existe = this.db.prepare(`
+        SELECT codigo FROM reglas_especiales WHERE codigo = ?
+    `).get(codigo)
+
+        const parametros = JSON.stringify(bloques)
+
+        if (existe) {
+            this.db.prepare(`
+            UPDATE reglas_especiales SET parametros = ? WHERE codigo = ?
+        `).run(parametros, codigo)
+        } else {
+            this.db.prepare(`
+            INSERT INTO reglas_especiales (codigo, tipo, parametros, activa)
+            VALUES (?, 'CONDICIONES', ?, 1)
+        `).run(codigo, parametros)
+        }
+    }
 }
 
 module.exports = SQLiteConnection
