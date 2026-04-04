@@ -304,6 +304,7 @@ async function cargarReglas() {
                     <button class="btn-ver" style="background-color:#dc3545;margin-left:4px;" onclick="toggleRegla('${r.codigo}', ${r.activa})">
                         ${r.activa ? 'Desactivar' : 'Activar'}
                     </button>
+                    <button class="btn-ver" style="background-color:#6c757d;margin-left:4px;" onclick="eliminarRegla('${r.codigo}')">Eliminar</button>
                 `
             }
         ],
@@ -380,6 +381,21 @@ async function guardarRegla() {
 
     if (response.ok) {
         bootstrap.Modal.getInstance(document.getElementById('modalEditarRegla')).hide()
+        cargarReglas()
+    } else {
+        alert('Error: ' + data.error)
+    }
+}
+async function eliminarRegla(codigo) {
+    if (!confirm(`¿Seguro que querés eliminar la regla ${codigo}? Esta acción no se puede deshacer.`)) return
+
+    const response = await fetch(`/api/reglas/${codigo}`, {
+        method: 'DELETE'
+    })
+
+    const data = await response.json()
+
+    if (response.ok) {
         cargarReglas()
     } else {
         alert('Error: ' + data.error)

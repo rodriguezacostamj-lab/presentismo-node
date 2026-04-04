@@ -70,6 +70,11 @@ class SQLiteConnection {
         VALUES (?, ?, ?, ?, ?, ?)
     `).run(codigo, nombre, tope, descuenta ? 1 : 0, corta ? 1 : 0, activa ? 1 : 0)
     }
+    eliminarRegla(codigo) {
+        this.db.prepare(`
+        DELETE FROM reglas_ausencias WHERE codigo = ?
+    `).run(codigo)
+    }
 }
 
 module.exports = SQLiteConnection

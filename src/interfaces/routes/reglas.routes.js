@@ -9,5 +9,6 @@ router.patch('/parametros', (req, res) => controller.actualizarParametro(req, re
 router.get('/', (req, res) => controller.obtenerReglas(req, res))
 router.patch('/:codigo', (req, res) => controller.actualizarRegla(req, res))
 router.post('/', (req, res) => controller.crearRegla(req, res))
+router.delete('/:codigo', (req, res) => controller.eliminarRegla(req, res))
 
 module.exports = router

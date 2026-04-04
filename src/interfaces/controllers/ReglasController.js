@@ -95,6 +95,22 @@ class ReglasController {
             return res.status(500).json({ error: error.message })
         }
     }
+    async eliminarRegla(req, res) {
+        try {
+            const { codigo } = req.params
+
+            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const repo = new ReglaRepository(db)
+
+            await repo.eliminarRegla(codigo)
+            db.cerrar()
+
+            return res.json({ mensaje: 'Regla eliminada correctamente.' })
+
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
 }
 
 module.exports = ReglasController
