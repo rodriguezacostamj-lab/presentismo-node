@@ -147,7 +147,7 @@ async function calcular() {
     }
 }
 // ver detalle
-function verDetalle(cuil) {
+window.verDetalle = function (cuil) {
     const datos = resultadosCache[cuil]
     if (!datos) return
 
@@ -300,12 +300,13 @@ async function cargarReglas() {
             {
                 data: null,
                 render: (d, t, r) => `
-                    <button class="btn-ver" style="background-color:#0d6efd;" onclick="editarRegla('${r.codigo}')">Editar</button>
-                    <button class="btn-ver" style="background-color:#dc3545;margin-left:4px;" onclick="toggleRegla('${r.codigo}', ${r.activa})">
-                        ${r.activa ? 'Desactivar' : 'Activar'}
-                    </button>
-                    <button class="btn-ver" style="background-color:#6c757d;margin-left:4px;" onclick="eliminarRegla('${r.codigo}')">Eliminar</button>
-                `
+    <button class="btn-ver" style="background-color:#0d6efd;" onclick="editarRegla('${r.codigo}')">Editar</button>
+    <button class="btn-ver" style="background-color:#dc3545;margin-left:4px;" onclick="toggleRegla('${r.codigo}', ${r.activa})">
+        ${r.activa ? 'Desactivar' : 'Activar'}
+    </button>
+    <button class="btn-ver" style="background-color:#6c757d;margin-left:4px;" onclick="eliminarRegla('${r.codigo}')">Eliminar</button>
+    ${r.regla ? `<button class="btn-ver" style="background-color:#ffc107;color:black;margin-left:4px;" onclick="abrirReglaEspecial('${r.codigo}')">⚙</button>` : ''}
+`
             }
         ],
         language: {
@@ -337,7 +338,7 @@ async function guardarValorBase() {
     }
 }
 
-async function toggleRegla(codigo, activa) {
+window.toggleRegla = async function (codigo, activa) {
     const response = await fetch(`/api/reglas/${codigo}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -347,7 +348,7 @@ async function toggleRegla(codigo, activa) {
     if (response.ok) cargarReglas()
 }
 
-function editarRegla(codigo) {
+window.editarRegla = function (codigo) {
     const regla = tablaReglas.data().toArray().find(r => r.codigo === codigo)
     if (!regla) return
 
@@ -386,7 +387,7 @@ async function guardarRegla() {
         alert('Error: ' + data.error)
     }
 }
-async function eliminarRegla(codigo) {
+window.eliminarRegla = async function (codigo) {
     if (!confirm(`¿Seguro que querés eliminar la regla ${codigo}? Esta acción no se puede deshacer.`)) return
 
     const response = await fetch(`/api/reglas/${codigo}`, {
@@ -443,3 +444,173 @@ async function crearRegla() {
         alert('Error: ' + data.error)
     }
 }
+// ================================
+// REGLAS ESPECIALES
+// ================================
+let codigoEspecialActual = null
+let bloquesEspecial = []
+
+window.abrirReglaEspecial = async function (codigo) {
+    codigoEspecialActual = codigo
+
+    const response = await fetch(`/api/reglas/${codigo}/especial`)
+    const data = await response.json()
+
+    document.getElementById('especial-codigo').textContent = codigo
+    document.getElementById('especial-activa').checked = data.especial?.activa ?? true
+
+    bloquesEspecial = data.especial?.bloques ?? []
+    renderizarBloques()
+
+    document.getElementById('seccion-presentismo').style.display = 'none'
+    document.getElementById('seccion-reglas').style.display = 'none'
+    document.getElementById('seccion-detalle').style.display = 'none'
+    document.getElementById('seccion-especial').style.display = 'block'
+}
+
+function renderizarBloques() {
+    const contenedor = document.getElementById('contenedor-bloques')
+    contenedor.innerHTML = ''
+
+    const camposDisponibles = {
+        discapacidad: 'Discapacidad',
+        edad: 'Edad',
+        vinculo: 'Vínculo',
+        nivel: 'Nivel educativo'
+    }
+
+    const camposPermitidos = obtenerCamposPorCodigo(codigoEspecialActual)
+
+    bloquesEspecial.forEach((bloque, index) => {
+
+        const opcionesCampo = camposPermitidos.map(c => `
+            <option value="${c}" ${bloque.condiciones?.[0]?.campo === c ? 'selected' : ''}>
+                ${camposDisponibles[c]}
+            </option>
+        `).join('')
+
+        contenedor.innerHTML += `
+            <div class="card shadow-sm mb-3" id="bloque-${index}">
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-2">
+                            <label class="form-label small">Prioridad</label>
+                            <input type="number" class="form-control form-control-sm" 
+                                value="${bloque.prioridad}" 
+                                onchange="actualizarBloque(${index}, 'prioridad', this.value)">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label small">Tope</label>
+                            <input type="number" class="form-control form-control-sm" 
+                                value="${bloque.tope}" 
+                                onchange="actualizarBloque(${index}, 'tope', this.value)">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small">Descripción</label>
+                            <input type="text" class="form-control form-control-sm" 
+                                value="${bloque.descripcion ?? ''}" 
+                                onchange="actualizarBloque(${index}, 'descripcion', this.value)">
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small">Campo</label>
+                            <select class="form-select form-select-sm" onchange="actualizarCondicion(${index}, 'campo', this.value)">
+                                ${opcionesCampo}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Operador</label>
+                            <select class="form-select form-select-sm" onchange="actualizarCondicion(${index}, 'operador', this.value)">
+                                <option value="="        ${bloque.condiciones?.[0]?.operador === '=' ? 'selected' : ''}>Es</option>
+                                <option value=">="       ${bloque.condiciones?.[0]?.operador === '>=' ? 'selected' : ''}>≥</option>
+                                <option value="<="       ${bloque.condiciones?.[0]?.operador === '<=' ? 'selected' : ''}>≤</option>
+                                <option value="CONTIENE" ${bloque.condiciones?.[0]?.operador === 'CONTIENE' ? 'selected' : ''}>Contiene</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small">Valor</label>
+                            <input type="text" class="form-control form-control-sm" 
+                                value="${bloque.condiciones?.[0]?.valor ?? ''}" 
+                                onchange="actualizarCondicion(${index}, 'valor', this.value)">
+                        </div>
+                    </div>
+                    <div class="text-end mt-3">
+                        <button class="btn btn-sm btn-outline-danger" onclick="eliminarBloque(${index})">🗑️ Eliminar bloque</button>
+                    </div>
+                </div>
+            </div>
+        `
+    })
+}
+
+function actualizarBloque(index, campo, valor) {
+    if (campo === 'prioridad' || campo === 'tope') {
+        bloquesEspecial[index][campo] = parseInt(valor)
+    } else {
+        bloquesEspecial[index][campo] = valor
+    }
+}
+
+function actualizarCondicion(index, campo, valor) {
+    if (!bloquesEspecial[index].condiciones) {
+        bloquesEspecial[index].condiciones = [{}]
+    }
+    bloquesEspecial[index].condiciones[0][campo] = valor
+}
+
+function agregarBloque() {
+    bloquesEspecial.push({
+        prioridad: bloquesEspecial.length + 1,
+        tope: 1,
+        descripcion: '',
+        condiciones: [{ campo: 'edad', operador: '=', valor: '' }]
+    })
+    renderizarBloques()
+}
+
+function eliminarBloque(index) {
+    bloquesEspecial.splice(index, 1)
+    renderizarBloques()
+}
+
+function eliminarTodosLosBloques() {
+    if (!confirm('¿Seguro que querés eliminar todos los bloques?')) return
+    bloquesEspecial = []
+    renderizarBloques()
+}
+
+async function guardarEspecial() {
+    const response = await fetch(`/api/reglas/${codigoEspecialActual}/especial`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bloques: bloquesEspecial })
+    })
+
+    const data = await response.json()
+
+    if (response.ok) {
+        alert('Regla especial guardada correctamente.')
+        volverAReglas()
+    } else {
+        alert('Error: ' + data.error)
+    }
+}
+
+function volverAReglas() {
+    document.getElementById('seccion-especial').style.display = 'none'
+    document.getElementById('seccion-reglas').style.display = 'block'
+    cargarReglas()
+}
+function obtenerCamposPorCodigo(codigo) {
+    if (codigo === '13A') return ['nivel']
+    if (codigo === '10J') return ['vinculo', 'edad', 'discapacidad']
+    return ['discapacidad', 'edad', 'vinculo', 'nivel']
+}
+window.editarRegla = editarRegla
+window.toggleRegla = toggleRegla
+window.eliminarRegla = eliminarRegla
+window.abrirReglaEspecial = abrirReglaEspecial
+window.verDetalle = verDetalle
+window.guardarRegla = guardarRegla
+window.crearRegla = crearRegla
