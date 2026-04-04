@@ -247,9 +247,109 @@ function limpiar() {
 function mostrarSeccion(seccion, el) {
     document.getElementById('seccion-presentismo').style.display = seccion === 'presentismo' ? 'block' : 'none'
     document.getElementById('seccion-reglas').style.display = seccion === 'reglas' ? 'block' : 'none'
+    document.getElementById('seccion-detalle').style.display = 'none'
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'))
     el.classList.add('active')
+
+    if (seccion === 'reglas') cargarReglas()
 }
 
 // Inicializar al cargar
 $(document).ready(() => inicializarTabla())
+
+// ================================
+// REGLAS
+// ================================
+let tablaReglas = null
+
+async function cargarReglas() {
+    const response = await fetch('/api/reglas')
+    const data = await response.json()
+
+    // Valor base
+    const resParametros = await fetch('/api/reglas/parametros')
+    const parametros = await resParametros.json()
+    const valorBase = parametros.presentismo_base
+    document.getElementById('input-valor-base').value = valorBase
+    document.getElementById('badge-valor-base').textContent = `Valor Presentismo $${Number(valorBase).toLocaleString('es-AR')}`
+
+    // Tabla de reglas
+    if (tablaReglas) {
+        tablaReglas.clear().rows.add(data.reglas).draw()
+        return
+    }
+
+    tablaReglas = $('#tabla-reglas').DataTable({
+        data: data.reglas,
+        columns: [
+            { data: 'codigo' },
+            { data: 'nombre' },
+            { data: 'diasTope', className: 'text-center' },
+            {
+                data: 'descuenta', className: 'text-center',
+                render: d => d ? '✔' : '✖'
+            },
+            {
+                data: 'corta', className: 'text-center',
+                render: d => d ? '✔' : '✖'
+            },
+            {
+                data: 'activa', className: 'text-center',
+                render: d => d ? '✔' : '✖'
+            },
+            {
+                data: null,
+                render: (d, t, r) => `
+                    <button class="btn-ver" style="background-color:#0d6efd;" onclick="editarRegla('${r.codigo}')">Editar</button>
+                    <button class="btn-ver" style="background-color:#dc3545;margin-left:4px;" onclick="toggleRegla('${r.codigo}', ${r.activa})">
+                        ${r.activa ? 'Desactivar' : 'Activar'}
+                    </button>
+                `
+            }
+        ],
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+        },
+        pageLength: 20,
+        dom: '<"d-flex justify-content-between mb-2"f>rtip',
+        buttons: []
+    })
+}
+
+async function guardarValorBase() {
+    const valor = document.getElementById('input-valor-base').value
+    if (!valor) return
+
+    const response = await fetch('/api/reglas/parametros', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clave: 'presentismo_base', valor })
+    })
+
+    const data = await response.json()
+    if (response.ok) {
+        document.getElementById('badge-valor-base').textContent =
+            `Valor Presentismo $${Number(valor).toLocaleString('es-AR')}`
+        alert('Valor actualizado correctamente.')
+    } else {
+        alert('Error: ' + data.error)
+    }
+}
+
+async function toggleRegla(codigo, activa) {
+    const response = await fetch(`/api/reglas/${codigo}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activa: !activa })
+    })
+
+    if (response.ok) cargarReglas()
+}
+
+function editarRegla(codigo) {
+    alert('Editar ' + codigo + ' - próximamente')
+}
+
+function abrirModalNuevaRegla() {
+    alert('Nueva regla - próximamente')
+}
