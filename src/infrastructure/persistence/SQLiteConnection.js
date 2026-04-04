@@ -18,6 +18,7 @@ class SQLiteConnection {
             ...r,
             descuenta: r.descuenta === 1,
             corta: r.corta === 1,
+            activa:    r.activa === 1,
             parametrosEspeciales: this.#obtenerParametrosEspeciales(r.codigo)
         }))
     }
@@ -53,6 +54,15 @@ class SQLiteConnection {
 
     cerrar() {
         this.db.close()
+    }
+    actualizarRegla(codigo, campos) {
+        const { nombre, tope, descuenta, corta, activa } = campos
+
+        this.db.prepare(`
+        UPDATE reglas_ausencias 
+        SET nombre = ?, tope = ?, descuenta = ?, corta = ?, activa = ?
+        WHERE codigo = ?
+    `).run(nombre, tope, descuenta ? 1 : 0, corta ? 1 : 0, activa ? 1 : 0, codigo)
     }
 }
 

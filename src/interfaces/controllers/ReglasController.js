@@ -6,7 +6,7 @@ class ReglasController {
 
     async obtenerParametros(req, res) {
         try {
-            const db   = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
             const repo = new ReglaRepository(db)
 
             const valor = await repo.obtenerParametro('presentismo_base')
@@ -27,13 +27,49 @@ class ReglasController {
                 return res.status(400).json({ error: 'Debe enviar clave y valor.' })
             }
 
-            const db   = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
             const repo = new ReglaRepository(db)
 
             await repo.actualizarParametro(clave, valor)
             db.cerrar()
 
             return res.json({ mensaje: 'Parámetro actualizado correctamente.' })
+
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
+    async obtenerReglas(req, res) {
+        try {
+            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const repo = new ReglaRepository(db)
+
+            const reglas = await repo.obtenerTodas()
+            db.cerrar()
+
+            return res.json({ reglas })
+
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
+
+    async actualizarRegla(req, res) {
+        try {
+            const { codigo } = req.params
+            const campos = req.body
+
+            if (!codigo || !campos) {
+                return res.status(400).json({ error: 'Datos incompletos.' })
+            }
+
+            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const repo = new ReglaRepository(db)
+
+            await repo.actualizarRegla(codigo, campos)
+            db.cerrar()
+
+            return res.json({ mensaje: 'Regla actualizada correctamente.' })
 
         } catch (error) {
             return res.status(500).json({ error: error.message })

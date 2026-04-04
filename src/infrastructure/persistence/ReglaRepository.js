@@ -14,6 +14,13 @@ class ReglaRepository {
     async actualizarParametro(clave, valor) {
         return this.db.actualizarParametro(clave, valor)
     }
+    async obtenerTodas() {
+        return this.db.obtenerReglas()
+    }
+
+    async actualizarRegla(codigo, campos) {
+        return this.db.actualizarRegla(codigo, campos)
+    }
 }
 
 module.exports = ReglaRepository
