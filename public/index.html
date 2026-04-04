@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,213 +16,386 @@
     <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet">
 
     <style>
-    body {
-        font-family: 'Inter', 'Segoe UI', sans-serif;
-        background-color: #f8f9fa;
-        font-size: 0.95rem;
-    }
-    .sidebar {
-        width: 200px;
-        min-height: 100vh;
-        background-color: #1a2035;
-        position: fixed;
-        top: 0; left: 0;
-    }
-    .sidebar .nav-link {
-        color: #adb5bd;
-        padding: 10px 20px;
-        font-size: 0.86rem;
-    }
-    .sidebar .nav-link.active {
-        color: #fff;
-        background-color: #0d6efd;
-        border-radius: 6px;
-        margin: 0 10px;
-    }
-    .sidebar .logo {
-        color: #fff;
-        font-weight: bold;
-        padding: 18px 20px;
-        font-size: 0.9rem;
-        border-bottom: 1px solid #2d3a5a;
-    }
-    .main-content {
-        margin-left: 200px;
-        padding: 20px 25px;
-    }
-    .page-title {
-        background: linear-gradient(135deg, #1a2035, #2d3a5a);
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        font-size: 0.85rem;
-    }
-    .badge-ok      { background-color: #198754; color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
-    .badge-revisar { background-color: #ffc107; color: black; padding: 2px 8px; border-radius: 20px; font-size: 0.7rem; }
-    .badge-fe      { background-color: #dc3545; color: white; padding: 2px 7px; border-radius: 20px; font-size: 0.65rem; }
-    .badge-cmj     { background-color: #6f42c1; color: white; padding: 2px 7px; border-radius: 20px; font-size: 0.65rem; }
-    .btn-ver {
-        background-color: #0d6efd;
-        border: none;
-        color: white;
-        padding: 2px 10px;
-        border-radius: 4px;
-        font-size: 0.85rem;
-        cursor: pointer;
-    }
-    .btn-ver:hover { background-color: #0b5ed7; }
-    table.dataTable tbody tr { font-size: 0.85rem; }
-    table.dataTable tbody tr:hover { background-color: #e8f0fe !important; }
-    table.dataTable tbody td { white-space: nowrap; padding: 5px 10px !important; vertical-align: middle !important; }
-    table.dataTable thead th { font-size: 0.80rem; font-weight: 600; letter-spacing: 0.04em; padding: 8px 10px !important; }
-    .dataTables_wrapper .dataTables_filter input { font-size: 0.8rem; }
-    .dataTables_wrapper .dataTables_length select { font-size: 0.8rem; }
-    .dataTables_wrapper .dataTables_info { font-size: 0.75rem; }
-    .dataTables_wrapper .dataTables_paginate { font-size: 0.8rem; }
-    .dt-buttons {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 8px;
-    }
-    .card { border: none; box-shadow: 0 1px 4px rgba(0,0,0,0.08) !important; }
-    .card-title { font-size: 0.95rem; font-weight: 600; }
-    .form-label { font-size: 0.82rem; }
-    .form-control { font-size: 0.82rem; }
-</style>
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+            font-size: 0.95rem;
+        }
+
+        .sidebar {
+            width: 200px;
+            min-height: 100vh;
+            background-color: #1a2035;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 10px 20px;
+            font-size: 0.86rem;
+        }
+
+        .sidebar .nav-link.active {
+            color: #fff;
+            background-color: #0d6efd;
+            border-radius: 6px;
+            margin: 0 10px;
+        }
+
+        .sidebar .logo {
+            color: #fff;
+            font-weight: bold;
+            padding: 18px 20px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #2d3a5a;
+        }
+
+        .main-content {
+            margin-left: 200px;
+            padding: 20px 25px;
+        }
+
+        .page-title {
+            background: linear-gradient(135deg, #1a2035, #2d3a5a);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+        }
+
+        .badge-ok {
+            background-color: #198754;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+
+        .badge-revisar {
+            background-color: #ffc107;
+            color: black;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+
+        .badge-fe {
+            background-color: #dc3545;
+            color: white;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+        }
+
+        .badge-cmj {
+            background-color: #6f42c1;
+            color: white;
+            padding: 2px 7px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+        }
+
+        .btn-ver {
+            background-color: #0d6efd;
+            border: none;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .btn-ver:hover {
+            background-color: #0b5ed7;
+        }
+
+        table.dataTable tbody tr {
+            font-size: 0.85rem;
+        }
+
+        table.dataTable tbody tr:hover {
+            background-color: #e8f0fe !important;
+        }
+
+        table.dataTable tbody td {
+            white-space: nowrap;
+            padding: 5px 10px !important;
+            vertical-align: middle !important;
+        }
+
+        table.dataTable thead th {
+            font-size: 0.80rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            padding: 8px 10px !important;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            font-size: 0.8rem;
+        }
+
+        .dataTables_wrapper .dataTables_length select {
+            font-size: 0.8rem;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            font-size: 0.75rem;
+        }
+
+        .dataTables_wrapper .dataTables_paginate {
+            font-size: 0.8rem;
+        }
+
+        .dt-buttons {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .form-label {
+            font-size: 0.82rem;
+        }
+
+        .form-control {
+            font-size: 0.82rem;
+        }
+    </style>
 </head>
+
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar d-flex flex-column">
-    <div class="logo">⚡ Presentismo</div>
-    <nav class="nav flex-column mt-3">
-        <a href="#" class="nav-link active" onclick="mostrarSeccion('presentismo', this)">
-            👥 Presentismo
-        </a>
-        <a href="#" class="nav-link" onclick="mostrarSeccion('reglas', this)">
-            ⚙️ Reglas de Ausencias
-        </a>
-    </nav>
-    <div class="mt-auto p-3">
-        <a href="#" class="nav-link text-danger">↩ Salir</a>
-    </div>
-</div>
-
-<!-- CONTENIDO PRINCIPAL -->
-<div class="main-content">
-
-    <!-- SECCIÓN PRESENTISMO -->
-    <div id="seccion-presentismo">
-        <div class="page-title">
-            <h5 class="mb-0">⚡ PREMIO PRESENTISMO</h5>
+    <!-- SIDEBAR -->
+    <div class="sidebar d-flex flex-column">
+        <div class="logo">⚡ Presentismo</div>
+        <nav class="nav flex-column mt-3">
+            <a href="#" class="nav-link active" onclick="mostrarSeccion('presentismo', this)">
+                👥 Presentismo
+            </a>
+            <a href="#" class="nav-link" onclick="mostrarSeccion('reglas', this)">
+                ⚙️ Reglas de Ausencias
+            </a>
+        </nav>
+        <div class="mt-auto p-3">
+            <a href="#" class="nav-link text-danger">↩ Salir</a>
         </div>
+    </div>
 
-        <div class="row g-4 mb-4">
-            <!-- Períodos -->
-            <div class="col-md-8">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h6 class="card-title mb-3">📅 SELECCIONAR PERÍODOS</h6>
-                        <div class="mb-3">
-                            <label class="form-label text-muted small">PERÍODO DE PRESENTISMO</label>
-                            <div class="row g-2">
-                                <div class="col">
-                                    <input type="date" id="desde_pres" class="form-control" value="2026-01-01">
-                                </div>
-                                <div class="col">
-                                    <input type="date" id="hasta_pres" class="form-control" value="2026-05-31">
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-content">
+
+        <!-- SECCIÓN PRESENTISMO -->
+        <div id="seccion-presentismo">
+            <div class="page-title">
+                <h5 class="mb-0">⚡ PREMIO PRESENTISMO</h5>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <!-- Períodos -->
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">📅 SELECCIONAR PERÍODOS</h6>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">PERÍODO DE PRESENTISMO</label>
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <input type="date" id="desde_pres" class="form-control" value="2026-01-01">
+                                    </div>
+                                    <div class="col">
+                                        <input type="date" id="hasta_pres" class="form-control" value="2026-05-31">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div>
-                            <label class="form-label text-muted small">PERÍODO DE LIQUIDACIÓN</label>
-                            <div class="row g-2">
-                                <div class="col">
-                                    <input type="date" id="desde_liq" class="form-control" value="2026-02-01">
-                                </div>
-                                <div class="col">
-                                    <input type="date" id="hasta_liq" class="form-control" value="2026-02-28">
+                            <div>
+                                <label class="form-label text-muted small">PERÍODO DE LIQUIDACIÓN</label>
+                                <div class="row g-2">
+                                    <div class="col">
+                                        <input type="date" id="desde_liq" class="form-control" value="2026-02-01">
+                                    </div>
+                                    <div class="col">
+                                        <input type="date" id="hasta_liq" class="form-control" value="2026-02-28">
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Archivos -->
-            <div class="col-md-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body d-flex flex-column">
-                        <h6 class="card-title mb-3">📁 ARCHIVOS</h6>
-                        <div class="mb-3">
-                            <label class="form-label small">CSV Ausencias <span class="text-danger">*</span></label>
-                            <input type="file" id="archivo-ausencias" class="form-control" accept=".csv">
+                <!-- Archivos -->
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title mb-3">📁 ARCHIVOS</h6>
+                            <div class="mb-3">
+                                <label class="form-label small">CSV Ausencias <span class="text-danger">*</span></label>
+                                <input type="file" id="archivo-ausencias" class="form-control" accept=".csv">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label small">Sueldos (opcional)</label>
+                                <input type="file" id="archivo-sueldos" class="form-control" accept=".csv,.xlsx,.xls">
+                            </div>
+                            <button class="btn mt-auto w-100" onclick="calcular()"
+                                style="background-color:#0b1738;color:white;font-size:0.82rem;">
+                                Calcular
+                            </button>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label small">Sueldos (opcional)</label>
-                            <input type="file" id="archivo-sueldos" class="form-control" accept=".csv,.xlsx,.xls">
-                        </div>
-                        <button class="btn mt-auto w-100" onclick="calcular()" style="background-color:#0b1738;color:white;font-size:0.82rem;">
-                         Calcular
-                        </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Tabla resultados -->
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="card-title mb-0">👥 LISTADO DE AGENTES</h6>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="limpiar()">Limpiar cálculo</button>
+            <!-- Tabla resultados -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="card-title mb-0">👥 LISTADO DE AGENTES</h6>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="limpiar()">Limpiar cálculo</button>
+                    </div>
+                    <table id="tabla-resultados" class="table table-hover table-sm w-100">
+                        <thead>
+                            <tr>
+                                <th>CUIL</th>
+                                <th>NOMBRE</th>
+                                <th>DÍAS DESC.</th>
+                                <th>%</th>
+                                <th>ALERTAS</th>
+                                <th>$ RRHH</th>
+                                <th>$ SUELDOS</th>
+                                <th>ESTADO</th>
+                                <th>ACCIÓN</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
-                <table id="tabla-resultados" class="table table-hover table-sm w-100">
-                    <thead>
-                        <tr>
-                            <th>CUIL</th>
-                            <th>NOMBRE</th>
-                            <th>DÍAS DESC.</th>
-                            <th>%</th>
-                            <th>ALERTAS</th>
-                            <th>$ RRHH</th>
-                            <th>$ SUELDOS</th>
-                            <th>ESTADO</th>
-                            <th>ACCIÓN</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+            </div>
+        </div>
+
+        <!-- SECCIÓN REGLAS -->
+        <div id="seccion-reglas" style="display:none">
+            <div class="page-title">
+                <h5 class="mb-0">⚙️ REGLAS DE AUSENCIAS</h5>
+            </div>
+            <div class="card shadow-sm">
+                <div class="card-body text-center text-muted py-5">
+                    Próximamente
+                </div>
+            </div>
+        </div>
+
+
+        <!-- SECCIÓN DETALLE -->
+        <div id="seccion-detalle" style="display:none">
+            <div class="page-title d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">📋 DETALLE DEL PRESENTISMO</h5>
+                <button class="btn btn-sm btn-outline-light" onclick="volverAlListado()">← Volver al listado</button>
+            </div>
+
+            <!-- Resumen -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">RESUMEN DEL PERÍODO</h6>
+                    <p><strong>Período de presentismo:</strong> <span id="det-periodo-pres"></span></p>
+                    <p><strong>Período de liquidación:</strong> <span id="det-periodo-liq"></span></p>
+                    <p><strong>Empleado:</strong> <span id="det-nombre"></span></p>
+                    <p><strong>CUIL:</strong> <span id="det-cuil"></span></p>
+                    <p><strong>Total días descontables:</strong> <span id="det-descontables"></span></p>
+                    <p><strong>Porcentaje de presentismo:</strong> <span id="det-porcentaje"></span></p>
+                </div>
+            </div>
+
+            <!-- Detalle de ausencias -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">DETALLE DE AUSENCIAS PARA EL PRESENTISMO</h6>
+                    <table id="tabla-detalle" class="table table-sm table-hover w-100">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Ausencia</th>
+                                <th>Cálculo</th>
+                                <th>Acumulados Previos</th>
+                                <th>Días Período</th>
+                                <th>Tope</th>
+                                <th>Días Descontables</th>
+                            </tr>
+                        </thead>
+                        <tbody id="det-tabla-detalle"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="text-end fw-bold">Total días descontables:</td>
+                                <td class="fw-bold" id="det-total-descontables"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Ausencias del período -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">AUSENCIAS DEL PERÍODO</h6>
+                    <table class="table table-sm table-hover w-100">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Nivel</th>
+                                <th>Desde</th>
+                                <th>Hasta</th>
+                                <th>Días</th>
+                            </tr>
+                        </thead>
+                        <tbody id="det-ausencias-periodo"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Ausencias anteriores -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">AUSENCIAS ANTERIORES</h6>
+                    <table class="table table-sm table-hover w-100">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Nivel</th>
+                                <th>Desde</th>
+                                <th>Hasta</th>
+                                <th>Días</th>
+                            </tr>
+                        </thead>
+                        <tbody id="det-ausencias-historicas"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- SECCIÓN REGLAS -->
-    <div id="seccion-reglas" style="display:none">
-        <div class="page-title">
-            <h5 class="mb-0">⚙️ REGLAS DE AUSENCIAS</h5>
-        </div>
-        <div class="card shadow-sm">
-            <div class="card-body text-center text-muted py-5">
-                Próximamente
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<!-- Scripts -->
-<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-<script src="presentismo.js"></script>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+    <script src="presentismo.js"></script>
 
 </body>
+
 </html>
