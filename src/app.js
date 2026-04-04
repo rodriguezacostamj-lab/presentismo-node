@@ -2,6 +2,8 @@ const express = require('express')
 const fileUpload = require('express-fileupload')
 const path = require('path')
 const presentismoRoutes = require('./interfaces/routes/presentismo.routes')
+const reglaRoutes = require('./interfaces/routes/reglas.routes')
+
 
 const app = express()
 
@@ -18,6 +20,7 @@ app.use(express.static(path.resolve('public')))
 
 // Rutas
 app.use('/api/presentismo', presentismoRoutes)
+app.use('/api/reglas', reglaRoutes)
 
 // Ruta raíz
 app.get('/', (req, res) => {
@@ -30,5 +33,6 @@ const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`)
 })
+
 
 module.exports = app

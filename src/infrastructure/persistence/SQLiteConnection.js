@@ -17,7 +17,7 @@ class SQLiteConnection {
         return reglas.map(r => ({
             ...r,
             descuenta: r.descuenta === 1,
-            corta:     r.corta === 1,
+            corta: r.corta === 1,
             parametrosEspeciales: this.#obtenerParametrosEspeciales(r.codigo)
         }))
     }
@@ -44,6 +44,11 @@ class SQLiteConnection {
         `).get(clave)
 
         return row?.valor ?? null
+    }
+    actualizarParametro(clave, valor) {
+        this.db.prepare(`
+        UPDATE parametros SET valor = ? WHERE clave = ?
+    `).run(String(valor), clave)
     }
 
     cerrar() {
