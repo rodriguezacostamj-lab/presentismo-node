@@ -18,7 +18,7 @@ class SQLiteConnection {
             ...r,
             descuenta: r.descuenta === 1,
             corta: r.corta === 1,
-            activa:    r.activa === 1,
+            activa: r.activa === 1,
             parametrosEspeciales: this.#obtenerParametrosEspeciales(r.codigo)
         }))
     }
@@ -63,6 +63,12 @@ class SQLiteConnection {
         SET nombre = ?, tope = ?, descuenta = ?, corta = ?, activa = ?
         WHERE codigo = ?
     `).run(nombre, tope, descuenta ? 1 : 0, corta ? 1 : 0, activa ? 1 : 0, codigo)
+    }
+    crearRegla({ codigo, nombre, tope = 0, descuenta = false, corta = false, activa = true }) {
+        this.db.prepare(`
+        INSERT INTO reglas_ausencias (codigo, nombre, tope, descuenta, corta, activa)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `).run(codigo, nombre, tope, descuenta ? 1 : 0, corta ? 1 : 0, activa ? 1 : 0)
     }
 }
 

@@ -387,5 +387,43 @@ async function guardarRegla() {
 }
 
 function abrirModalNuevaRegla() {
-    alert('Nueva regla - próximamente')
+    // Limpiar campos
+    document.getElementById('nueva-codigo').value = ''
+    document.getElementById('nueva-nombre').value = ''
+    document.getElementById('nueva-tope').value = '0'
+    document.getElementById('nueva-descuenta').checked = false
+    document.getElementById('nueva-corta').checked = false
+    document.getElementById('nueva-activa').checked = true
+
+    const modal = new bootstrap.Modal(document.getElementById('modalNuevaRegla'))
+    modal.show()
+}
+
+async function crearRegla() {
+    const codigo = document.getElementById('nueva-codigo').value.trim()
+    const nombre = document.getElementById('nueva-nombre').value.trim()
+    const tope = parseInt(document.getElementById('nueva-tope').value)
+    const descuenta = document.getElementById('nueva-descuenta').checked
+    const corta = document.getElementById('nueva-corta').checked
+    const activa = document.getElementById('nueva-activa').checked
+
+    if (!codigo || !nombre) {
+        alert('Código y nombre son obligatorios.')
+        return
+    }
+
+    const response = await fetch('/api/reglas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codigo, nombre, tope, descuenta, corta, activa })
+    })
+
+    const data = await response.json()
+
+    if (response.ok) {
+        bootstrap.Modal.getInstance(document.getElementById('modalNuevaRegla')).hide()
+        cargarReglas()
+    } else {
+        alert('Error: ' + data.error)
+    }
 }

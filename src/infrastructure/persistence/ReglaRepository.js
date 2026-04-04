@@ -21,6 +21,9 @@ class ReglaRepository {
     async actualizarRegla(codigo, campos) {
         return this.db.actualizarRegla(codigo, campos)
     }
+    async crearRegla(campos) {
+        return this.db.crearRegla(campos)
+    }
 }
 
 module.exports = ReglaRepository

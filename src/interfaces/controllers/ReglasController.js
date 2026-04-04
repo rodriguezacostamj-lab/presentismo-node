@@ -75,6 +75,26 @@ class ReglasController {
             return res.status(500).json({ error: error.message })
         }
     }
+    async crearRegla(req, res) {
+        try {
+            const campos = req.body
+
+            if (!campos.codigo || !campos.nombre) {
+                return res.status(400).json({ error: 'Código y nombre son obligatorios.' })
+            }
+
+            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const repo = new ReglaRepository(db)
+
+            await repo.crearRegla(campos)
+            db.cerrar()
+
+            return res.status(201).json({ mensaje: 'Regla creada correctamente.' })
+
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
 }
 
 module.exports = ReglasController
