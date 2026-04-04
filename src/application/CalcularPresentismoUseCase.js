@@ -51,10 +51,6 @@ class CalcularPresentismoUseCase {
 
         for (const emp of empleados) {
             const resultado = calc.analizar(emp, periodoLiquidacion, periodoPresentismo)
-
-            emp.obtenerAusencias().forEach(a => {
-                console.log('nivel:', a.nivel, '| causal:', a.causal, '| fechaDesde:', a.fechaDesde, '| fechaHasta:', a.fechaHasta)
-            })
             const cuil = emp.cuil
             const infoSueldo = sueldosPorCuil[cuil] ?? null
             const porcentaje = resultado.porcentaje ?? 0
