@@ -431,6 +431,58 @@
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
     <script src="presentismo.js"></script>
 
+    <!-- Modal editar regla -->
+    <div class="modal fade" id="modalEditarRegla" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#1a2035;color:white;">
+                    <h6 class="modal-title">Editar Regla</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="edit-codigo">
+                    <div class="mb-3">
+                        <label class="form-label small">Código</label>
+                        <input type="text" id="edit-codigo-display" class="form-control form-control-sm" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Nombre</label>
+                        <input type="text" id="edit-nombre" class="form-control form-control-sm">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small">Tope</label>
+                        <input type="number" id="edit-tope" class="form-control form-control-sm">
+                    </div>
+                    <div class="row g-3">
+                        <div class="col">
+                            <div class="form-check">
+                                <input type="checkbox" id="edit-descuenta" class="form-check-input">
+                                <label class="form-check-label small">Descuenta</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check">
+                                <input type="checkbox" id="edit-corta" class="form-check-input">
+                                <label class="form-check-label small">Corta</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-check">
+                                <input type="checkbox" id="edit-activa" class="form-check-input">
+                                <label class="form-check-label small">Activa</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-sm" style="background-color:#0b1738;color:white;"
+                        onclick="guardarRegla()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

@@ -347,7 +347,43 @@ async function toggleRegla(codigo, activa) {
 }
 
 function editarRegla(codigo) {
-    alert('Editar ' + codigo + ' - próximamente')
+    const regla = tablaReglas.data().toArray().find(r => r.codigo === codigo)
+    if (!regla) return
+
+    document.getElementById('edit-codigo').value = regla.codigo
+    document.getElementById('edit-codigo-display').value = regla.codigo
+    document.getElementById('edit-nombre').value = regla.nombre
+    document.getElementById('edit-tope').value = regla.diasTope
+    document.getElementById('edit-descuenta').checked = regla.descuenta
+    document.getElementById('edit-corta').checked = regla.corta
+    document.getElementById('edit-activa').checked = regla.activa
+
+    const modal = new bootstrap.Modal(document.getElementById('modalEditarRegla'))
+    modal.show()
+}
+
+async function guardarRegla() {
+    const codigo = document.getElementById('edit-codigo').value
+    const nombre = document.getElementById('edit-nombre').value
+    const tope = parseInt(document.getElementById('edit-tope').value)
+    const descuenta = document.getElementById('edit-descuenta').checked
+    const corta = document.getElementById('edit-corta').checked
+    const activa = document.getElementById('edit-activa').checked
+
+    const response = await fetch(`/api/reglas/${codigo}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre, tope, descuenta, corta, activa })
+    })
+
+    const data = await response.json()
+
+    if (response.ok) {
+        bootstrap.Modal.getInstance(document.getElementById('modalEditarRegla')).hide()
+        cargarReglas()
+    } else {
+        alert('Error: ' + data.error)
+    }
 }
 
 function abrirModalNuevaRegla() {
