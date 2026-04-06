@@ -63,7 +63,7 @@ class LectorCSV {
             const causalUpper = causal.toUpperCase()
             if (causalUpper.includes('INJUSTIFICADA')) return 'INJ'
             if (causalUpper.includes('HUELGA')) return 'HUE'
-            if (causalUpper.includes('CARGO MAYOR')) return 'CMJ'  // ← agregá esta línea
+            if (causalUpper.includes('CARGO MAYOR')) return 'CMJ'  
             return null
         }
 
@@ -72,16 +72,15 @@ class LectorCSV {
     }
 
     #parsearFecha(valor) {
-        if (!valor || valor === 'null') return null
+    if (!valor || valor === 'null') return null
 
-        // Formato: "16/07/12 00:00" → necesitamos "20" + "12" para el año
-        const [fecha] = valor.split(' ')
-        const [dia, mes, anio] = fecha.split('/')
+    const [fecha] = valor.split(' ')
+    const [dia, mes, anio] = fecha.split('/')
 
-        // El año viene con 2 dígitos: "12" → "2012"
-        const anioCompleto = parseInt(anio) < 50 ? `20${anio}` : `19${anio}`
+    const anioCompleto = parseInt(anio) < 50 ? `20${anio}` : `19${anio}`
 
-        return new Date(`${anioCompleto}-${mes}-${dia}`)
+    
+    return new Date(parseInt(anioCompleto), parseInt(mes) - 1, parseInt(dia))
     }
 
     #parsearCSV(rutaArchivo) {

@@ -4,7 +4,7 @@ class Periodo {
     const [hastaY, hastaM, hastaD] = hasta.split('-').map(Number)
     
     this.desde = new Date(desdeY, desdeM - 1, desdeD)
-    this.hasta = new Date(hastaY, hastaM - 1, hastaD, 23, 59, 59)
+    this.hasta = new Date(hastaY, hastaM - 1, hastaD)
     }
 
     contiene(fecha) {
@@ -12,12 +12,12 @@ class Periodo {
     }
 
     interseccion(aDesde, aHasta) {
-        const desde = aDesde > this.desde ? aDesde : this.desde
-        const hasta = aHasta < this.hasta ? aHasta : this.hasta
+    const desde = aDesde > this.desde ? aDesde : this.desde
+    const hasta = aHasta < this.hasta ? aHasta : this.hasta
 
-        if (desde > hasta) return null
+    if (desde > hasta) return null
 
-        return [desde, hasta]
+    return [desde, hasta]
     }
 
     static mes(anio, mes) {
