@@ -222,8 +222,8 @@ window.verDetalle = function (cuil) {
 
 function formatearFecha(fechaStr) {
     if (!fechaStr) return '—'
-    const d = new Date(fechaStr)
-    return d.toLocaleDateString('es-AR')
+    const [anio, mes, dia] = fechaStr.split('T')[0].split('-')
+    return `${parseInt(dia)}/${parseInt(mes)}/${anio}`
 }
 
 function mostrarSeccionDetalle() {

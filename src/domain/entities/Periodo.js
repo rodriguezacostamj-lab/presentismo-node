@@ -1,7 +1,10 @@
 class Periodo {
     constructor(desde, hasta) {
-        this.desde = new Date(desde)
-        this.hasta = new Date(hasta)
+    const [desdeY, desdeM, desdeD] = desde.split('-').map(Number)
+    const [hastaY, hastaM, hastaD] = hasta.split('-').map(Number)
+    
+    this.desde = new Date(desdeY, desdeM - 1, desdeD)
+    this.hasta = new Date(hastaY, hastaM - 1, hastaD, 23, 59, 59)
     }
 
     contiene(fecha) {
