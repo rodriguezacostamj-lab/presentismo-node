@@ -29,6 +29,7 @@ class CalcularPresentismoUseCase {
         const basePremio100 = parseFloat(
             await this.repositorioReglas.obtenerParametro('presentismo_base') ?? 0
         )
+        
 
         // 3. Leer archivos
         const lectorCSV = new LectorCSV()

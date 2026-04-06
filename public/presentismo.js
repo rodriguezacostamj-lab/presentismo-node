@@ -34,10 +34,11 @@ function inicializarTabla() {
             {
                 data: 'estado', className: 'text-center',
                 render: d => {
-                    if (d === 'OK') return '<span class="badge-ok">OK</span>'
-                    if (d === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
-                    return '—'
-                }
+                if (d === 'OK')          return '<span class="badge-ok">OK</span>'
+                if (d === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
+                if (d === 'NO_EXISTE')   return '<span class="badge-noexiste">No existe</span>'
+                return '—'
+            }
             },
             {
                 data: 'cuil', className: 'text-center',
@@ -127,8 +128,8 @@ async function calcular() {
                 porcentaje: r.resultado.porcentaje,
                 funcionEjecutiva: r.empleado.funcionEjecutiva,
                 cargoMayor: r.empleado.cargoMayor,
-                importeRrhh: r.premio?.importe_rrhh ?? null,
-                importeEsperado: r.premio?.importe_esperado ?? null,
+                importeRrhh: r.premio?.importe_esperado ?? null,
+                importeEsperado: r.premio?.importe_rrhh ?? null,
                 estado: r.premio?.estado ?? null,
                 detalle: r.resultado
             }

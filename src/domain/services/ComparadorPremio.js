@@ -9,7 +9,7 @@ class ComparadorPremio {
         // No existe en sueldos
         if (infoSueldo === null) {
             if (tieneAlertaEspecial) return ComparadorPremio.OK
-            if (Math.round(importeEsperado * 100) / 100 > 0) return ComparadorPremio.NO_COINCIDE
+            if (Math.round(importeEsperado * 100) / 100 > 0) return ComparadorPremio.NO_EXISTE
             return ComparadorPremio.OK
         }
 
