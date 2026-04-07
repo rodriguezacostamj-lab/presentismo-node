@@ -46,7 +46,13 @@ class AuthController {
     logout(req, res) {
     req.session.destroy()
     return res.json({ mensaje: 'Sesión cerrada correctamente.' })
-}    
+}   
+    me(req, res) {
+    if (!req.session?.usuario) {
+        return res.status(401).json({ error: 'No autenticado.' })
+    }
+    return res.json({ usuario: req.session.usuario })
+} 
 
 }
 

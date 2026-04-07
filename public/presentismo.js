@@ -256,7 +256,17 @@ function mostrarSeccion(seccion, el) {
 }
 
 // Inicializar al cargar
-$(document).ready(() => inicializarTabla())
+$(document).ready(async () => {
+    // Verificar si hay sesión activa
+    const response = await fetch('/api/auth/me')
+    
+    if (response.ok) {
+        // Hay sesión activa, ocultar login
+        document.getElementById('pantalla-login').style.display = 'none'
+    }
+    
+    inicializarTabla()
+})
 
 // ================================
 // REGLAS
