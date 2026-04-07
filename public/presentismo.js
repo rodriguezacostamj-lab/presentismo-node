@@ -615,3 +615,47 @@ window.abrirReglaEspecial = abrirReglaEspecial
 window.verDetalle = verDetalle
 window.guardarRegla = guardarRegla
 window.crearRegla = crearRegla
+
+// ================================
+// AUTH
+// ================================
+async function iniciarSesion() {
+    const usuario  = document.getElementById('login-usuario').value.trim()
+    const password = document.getElementById('login-password').value.trim()
+    const errorDiv = document.getElementById('login-error')
+
+    if (!usuario || !password) {
+        errorDiv.textContent = 'Ingresá usuario y contraseña.'
+        errorDiv.classList.remove('d-none')
+        return
+    }
+
+    try {
+        const response = await fetch('/api/auth/login', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ usuario, password })
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+            errorDiv.textContent = data.error
+            errorDiv.classList.remove('d-none')
+            return
+        }
+
+        // Login exitoso - ocultar pantalla de login
+        document.getElementById('pantalla-login').style.display = 'none'
+        errorDiv.classList.add('d-none')
+
+    } catch (error) {
+        errorDiv.textContent = 'Error al conectar con el servidor.'
+        errorDiv.classList.remove('d-none')
+    }
+}
+
+async function cerrarSesion() {
+    await fetch('/api/auth/logout', { method: 'POST' })
+    document.getElementById('pantalla-login').style.display = 'flex'
+}

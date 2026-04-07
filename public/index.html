@@ -178,7 +178,58 @@
 </head>
 
 <body>
+    
+   <!-- PANTALLA DE LOGIN -->
+<div id="pantalla-login" style="
+    position: fixed; top: 60px; left: 0; width: 100%; height: calc(100% - 60px);
+    background-color: #e9ecef; display: flex; align-items: center; 
+    justify-content: center; z-index: 9999;">
+    <!-- BARRA SUPERIOR -->
+<div style="
+    background-color: white;
+    border-bottom: 1px solid #dee2e6;
+    height: 60px;
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+">
+</div>
+    
+    <div class="card shadow-lg" style="width: 750px; border:none; border-radius: 12px; overflow:hidden;">
+        <div class="row g-0">
+            <!-- Panel izquierdo -->
+            <div class="col-md-6 d-flex flex-column justify-content-center p-5" style="background-color:#1a2035;">
+                <h4 class="fw-bold mb-3" style="color:white;">Sistema de Gestión de Presentismo</h4>
+                <p class="small" style="color:#adb5bd;">
+                    Análisis, control y cálculo del presentismo del personal. 
+                    Integra reglas generales y especiales de ausencias, evaluación 
+                    por períodos y generación de resultados para su correcta liquidación.
+                </p>
+            </div>
+            <!-- Panel derecho -->
+            <div class="col-md-6 p-5 bg-white">
+                <h5 class="fw-bold mb-4">User Login</h5>
 
+                <div id="login-error" class="alert alert-danger d-none small"></div>
+
+                <div class="mb-3">
+                    <label class="form-label small">Usuario</label>
+                    <input type="text" id="login-usuario" class="form-control" placeholder="Usuario">
+                </div>
+                <div class="mb-4">
+                    <label class="form-label small">Contraseña</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="Contraseña">
+                </div>
+                <button class="btn w-100" style="background-color:#1a2035;color:white;" onclick="iniciarSesion()">
+                    Ingresar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- SIDEBAR -->
     <div class="sidebar d-flex flex-column">
         <div class="logo">⚡ Presentismo</div>
@@ -191,7 +242,7 @@
             </a>
         </nav>
         <div class="mt-auto p-3">
-            <a href="#" class="nav-link text-danger">↩ Salir</a>
+            <a href="#" class="nav-link text-danger" onclick="cerrarSesion()">↩ Salir</a>
         </div>
     </div>
 

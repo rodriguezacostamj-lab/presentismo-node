@@ -109,6 +109,13 @@ class SQLiteConnection {
         `).run(codigo, parametros)
         }
     }
+    obtenerUsuarioPorNombre(usuario) {
+    return this.db.prepare(`
+        SELECT id, usuario, password, nombre, rol, activo
+        FROM usuarios
+        WHERE usuario = ? AND activo = 1
+    `).get(usuario)
+}
 }
 
 module.exports = SQLiteConnection
