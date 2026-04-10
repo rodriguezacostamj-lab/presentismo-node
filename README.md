@@ -122,6 +122,86 @@ http://localhost:3000
 
 ---
 
+## Testing
+
+El proyecto incluye tests unitarios sobre la lógica de dominio, escritos con [Jest](https://jestjs.io/).
+
+### Instalación de dependencias de desarrollo
+
+```bash
+npm install --save-dev jest
+```
+
+### Correr los tests
+
+```bash
+npx jest
+```
+
+### Resultado esperado
+
+```
+PASS  __tests__/periodo.test.js
+PASS  __tests__/tipo-ausencia.test.js
+PASS  __tests__/calculadora-presentismo.test.js
+
+Test Suites: 3 passed, 3 total
+Tests:       32 passed, 32 total
+Time:        ~1s
+```
+
+### Qué se testea
+
+**`periodo.test.js` — Solapamiento de fechas**
+
+El caso más crítico del sistema: ausencias que cruzan el límite entre dos meses.
+
+```
+ausencia: 29/09 → 02/10
+período:  octubre
+resultado: 2 días (01/10 y 02/10)
+```
+
+Cubre además: ausencias dentro del período, fuera del período, que cruzan el inicio,
+que cruzan el fin, y que abarcan el mes completo. Incluye verificación de años bisiestos.
+
+**`tipo-ausencia.test.js` — Reglas especiales**
+
+Testea el motor de condiciones de `TipoAusencia`: evaluación de `parametrosEspeciales`,
+resolución de clave y cálculo de tope según condiciones reales de las reglas **10J** y **13A**.
+
+```
+10J — Enfermedad familiar:
+  discapacidad = true  → tope 30
+  edad <= 12           → tope 5
+  sin condición        → tope base
+
+13A — Licencia por examen:
+  nivel UNIVERSITARIO  → tope 10
+  nivel SECUNDARIO     → tope 2
+```
+
+**`calculadora-presentismo.test.js` — Cálculo de presentismo**
+
+Testea `CalculadoraPresentismo.analizar()` de extremo a extremo:
+
+- Porcentajes según días descontables (0→100%, 1→70%, 2→40%, 3+→0%)
+- Corte total por ausencia injustificada (`corta: true`)
+- Ausencias dentro del tope → no descuentan
+- Acumulación histórica que consume el tope antes del período de liquidación
+
+### Estructura de los tests
+
+```
+presentismo-node/
+└── __tests__/
+    ├── periodo.test.js
+    ├── tipo-ausencia.test.js
+    └── calculadora-presentismo.test.js
+```
+
+---
+
 ## Estructura del proyecto
 
 ```

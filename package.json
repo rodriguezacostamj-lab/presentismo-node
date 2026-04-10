@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -18,5 +19,8 @@
     "express-fileupload": "^1.5.2",
     "express-session": "^1.19.0",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   }
 }
