@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt')
-const SQLiteConnection = require('../../infrastructure/persistence/SQLiteConnection')
+const PostgresConnection = require('../../infrastructure/persistence/PostgresConnection')
 const path = require('path')
 
 class AuthController {
@@ -12,7 +12,7 @@ class AuthController {
                 return res.status(400).json({ error: 'Usuario y contraseña son obligatorios.' })
             }
 
-            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new PostgresConnection()
             const user = db.obtenerUsuarioPorNombre(usuario)
             db.cerrar()
 

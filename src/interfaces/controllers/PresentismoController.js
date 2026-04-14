@@ -1,6 +1,6 @@
 const CalcularPresentismoUseCase = require('../../application/CalcularPresentismoUseCase')
 const ReglaRepository = require('../../infrastructure/persistence/ReglaRepository')
-const SQLiteConnection = require('../../infrastructure/persistence/SQLiteConnection')
+const PostgresConnection = require('../../infrastructure/persistence/PostgresConnection')
 const path = require('path')
 const fs = require('fs')
 
@@ -43,7 +43,7 @@ if (req.files?.sueldos) {
     rutaSueldos = tempPath
 }
             // Conectar DB y ejecutar caso de uso
-            const db   = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new PostgresConnection()
             const repo = new ReglaRepository(db)
             const useCase = new CalcularPresentismoUseCase(repo)
 
