@@ -13,7 +13,7 @@ class AuthController {
             }
 
             const db = new PostgresConnection()
-            const user = db.obtenerUsuarioPorNombre(usuario)
+            const user = await db.obtenerUsuarioPorNombre(usuario)
             db.cerrar()
 
             if (!user) {
