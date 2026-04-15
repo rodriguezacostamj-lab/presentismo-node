@@ -1,4 +1,5 @@
 # Sistema de Gestión de Presentismo — Node.js
+![Tests](https://github.com/rodriguezacostamj-lab/presentismo-node/actions/workflows/tests.yml/badge.svg)
 
 Migración del sistema de auditoría de presentismo de PHP a Node.js. API REST con arquitectura hexagonal que procesa reportes de ausencias y sueldos, calcula el premio presentismo por empleado y detecta errores de liquidación automáticamente.
 
@@ -189,6 +190,8 @@ Testea `CalculadoraPresentismo.analizar()` de extremo a extremo:
 - Corte total por ausencia injustificada (`corta: true`)
 - Ausencias dentro del tope → no descuentan
 - Acumulación histórica que consume el tope antes del período de liquidación
+
+Los tests corren automáticamente en cada push mediante GitHub Actions.
 
 ### Estructura de los tests
 
