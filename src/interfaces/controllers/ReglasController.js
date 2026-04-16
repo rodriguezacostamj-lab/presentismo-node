@@ -1,12 +1,12 @@
-const SQLiteConnection = require('../../infrastructure/persistence/SQLiteConnection')
+const PostgresConnection = require('../../infrastructure/persistence/PostgresConnection')
 const ReglaRepository = require('../../infrastructure/persistence/ReglaRepository')
-const path = require('path')
+
 
 class ReglasController {
 
     async obtenerParametros(req, res) {
         try {
-            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new PostgresConnection()
             const repo = new ReglaRepository(db)
 
             const valor = await repo.obtenerParametro('presentismo_base')
@@ -27,7 +27,7 @@ class ReglasController {
                 return res.status(400).json({ error: 'Debe enviar clave y valor.' })
             }
 
-            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new PostgresConnection()
             const repo = new ReglaRepository(db)
 
             await repo.actualizarParametro(clave, valor)
@@ -41,7 +41,7 @@ class ReglasController {
     }
     async obtenerReglas(req, res) {
         try {
-            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new PostgresConnection()
             const repo = new ReglaRepository(db)
 
             const reglas = await repo.obtenerTodas()
@@ -63,7 +63,7 @@ class ReglasController {
                 return res.status(400).json({ error: 'Datos incompletos.' })
             }
 
-            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new PostgresConnection()
             const repo = new ReglaRepository(db)
 
             await repo.actualizarRegla(codigo, campos)
@@ -83,7 +83,7 @@ class ReglasController {
                 return res.status(400).json({ error: 'Código y nombre son obligatorios.' })
             }
 
-            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new PostgresConnection()
             const repo = new ReglaRepository(db)
 
             await repo.crearRegla(campos)
@@ -99,7 +99,7 @@ class ReglasController {
         try {
             const { codigo } = req.params
 
-            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new PostgresConnection()
             const repo = new ReglaRepository(db)
 
             await repo.eliminarRegla(codigo)
@@ -115,7 +115,7 @@ class ReglasController {
         try {
             const { codigo } = req.params
 
-            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new PostgresConnection()
             const repo = new ReglaRepository(db)
 
             const especial = await repo.obtenerEspecial(codigo)
@@ -137,7 +137,7 @@ class ReglasController {
                 return res.status(400).json({ error: 'bloques debe ser un array.' })
             }
 
-            const db = new SQLiteConnection(path.resolve('data/presentismo.db'))
+            const db = new PostgresConnection()
             const repo = new ReglaRepository(db)
 
             await repo.guardarEspecial(codigo, bloques)
