@@ -87,7 +87,7 @@ class CalculadoraPresentismo {
             const clave = tipo ? tipo.resolverClave(a) : a.codigo
 
             const topeEfectivo = tipo.getTopeParaAusencia(a)
-            if (tipo && tipo.topeEfectivo > 0) {
+            if (tipo && topeEfectivo > 0) {
                 diasHistoricoPorClave[clave] = (diasHistoricoPorClave[clave] ?? 0) + a.dias
             }
         }
