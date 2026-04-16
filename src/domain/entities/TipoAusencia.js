@@ -25,24 +25,26 @@ class TipoAusencia {
     }
 
     resolverClave(ausencia) {
-        if (this.parametrosEspeciales.length === 0) {
-            return this.codigo
-        }
-
-        const bloques = [...this.parametrosEspeciales].sort(
-            (a, b) => (a.prioridad ?? 999) - (b.prioridad ?? 999)
-        )
-
-        for (const bloque of bloques) {
-            const condiciones = bloque.condiciones ?? []
-            if (this.#cumpleTodasLasCondiciones(ausencia, condiciones)) {
-                // La clave viene del bloque configurado, no hardcodeada
-                return bloque.clave ?? this.codigo
-            }
-        }
-
+    if (this.parametrosEspeciales.length === 0) {
         return this.codigo
     }
+    const bloques = [...this.parametrosEspeciales].sort(
+        (a, b) => (a.prioridad ?? 999) - (b.prioridad ?? 999)
+    )
+    for (const bloque of bloques) {
+        const condiciones = bloque.condiciones ?? []
+        if (this.#cumpleTodasLasCondiciones(ausencia, condiciones)) {
+            // Si tiene clave explícita la usa, si no genera una automática
+            if (bloque.clave) return bloque.clave
+            const primera = condiciones[0]
+            if (primera) {
+                return `${this.codigo}_${primera.campo}_${primera.valor}`
+            }
+            return this.codigo
+        }
+    }
+    return this.codigo
+}
 
     #evaluarCondiciones(ausencia) {
         const bloques = [...this.parametrosEspeciales].sort(
@@ -81,6 +83,18 @@ class TipoAusencia {
             default:         return false
         }
     }
+    resolverDescripcion(ausencia) {
+    const bloques = [...this.parametrosEspeciales].sort(
+        (a, b) => (a.prioridad ?? 999) - (b.prioridad ?? 999)
+    )
+    for (const bloque of bloques) {
+        const condiciones = bloque.condiciones ?? []
+        if (this.#cumpleTodasLasCondiciones(ausencia, condiciones)) {
+            return bloque.descripcion ?? 'Regla especial'
+        }
+    }
+    return 'Tope general'
+}
 }
 
 module.exports = TipoAusencia

@@ -146,15 +146,18 @@ class CalculadoraPresentismo {
                 totalDescontables += descontables
             }
 
-            detalle.push({
-                codigo: ausenciaRef.codigo,
-                nombre: tipo.nombre,
-                nivel: ausenciaRef.nivel ?? '-',
-                dias: diasPeriodo,
-                tope,
-                historicos: usadoAntes,
-                descontables,
-            })
+           detalle.push({
+           codigo:          ausenciaRef.codigo,
+           nombre:          tipo.nombre,
+           nivel:           ausenciaRef.nivel ?? '-',
+           dias:            diasPeriodo,
+           tope,
+           historicos:      usadoAntes,
+           descontables,
+           explicacion_tope: tipo.parametrosEspeciales.length > 0
+           ? tipo.resolverDescripcion(ausenciaRef)
+           : 'Tope general'
+         })
         }
 
         // =============================
