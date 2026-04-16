@@ -14,7 +14,7 @@ class CalculadoraPresentismo {
         const delPeriodo = []
 
         const pPresDesde = periodoPresentismo.desde
-        const pLiqDesde  = periodoLiquidacion.desde
+        const pLiqDesde = periodoLiquidacion.desde
 
         // =============================
         // SEPARAR HISTÓRICAS Y DEL PERÍODO
@@ -65,14 +65,14 @@ class CalculadoraPresentismo {
             const tipo = this.catalogo.obtener(a.codigo)
             if (tipo?.corta) {
                 return {
-                    ausenciasPeriodo:    delPeriodo,
+                    ausenciasPeriodo: delPeriodo,
                     ausenciasHistoricas: historicas,
-                    detalle:             [],
-                    total_descontables:  0,
-                    porcentaje:          0,
-                    corte:               true,
-                    codigo_corte:        a.codigo,
-                    nombre_corte:        tipo.nombre,
+                    detalle: [],
+                    total_descontables: 0,
+                    porcentaje: 0,
+                    corte: true,
+                    codigo_corte: a.codigo,
+                    nombre_corte: tipo.nombre,
                 }
             }
         }
@@ -86,7 +86,7 @@ class CalculadoraPresentismo {
             const tipo = this.catalogo.obtener(a.codigo)
             const clave = tipo ? tipo.resolverClave(a) : a.codigo
 
-            const topeEfectivo = tipo.getTopeParaAusencia(a)
+            const topeEfectivo = tipo ? tipo.getTopeParaAusencia(a) : 0
             if (tipo && topeEfectivo > 0) {
                 diasHistoricoPorClave[clave] = (diasHistoricoPorClave[clave] ?? 0) + a.dias
             }
@@ -120,7 +120,7 @@ class CalculadoraPresentismo {
 
             if (!tipo) continue
 
-            const tope       = tipo.getTopeParaAusencia(ausenciaRef)
+            const tope = tipo.getTopeParaAusencia(ausenciaRef)
             const usadoAntes = diasHistoricoPorClave[clave] ?? 0
 
             let descontablesCalculados
@@ -147,12 +147,12 @@ class CalculadoraPresentismo {
             }
 
             detalle.push({
-                codigo:      ausenciaRef.codigo,
-                nombre:      tipo.nombre,
-                nivel:       ausenciaRef.nivel ?? '-',
-                dias:        diasPeriodo,
+                codigo: ausenciaRef.codigo,
+                nombre: tipo.nombre,
+                nivel: ausenciaRef.nivel ?? '-',
+                dias: diasPeriodo,
                 tope,
-                historicos:  usadoAntes,
+                historicos: usadoAntes,
                 descontables,
             })
         }
@@ -161,16 +161,16 @@ class CalculadoraPresentismo {
         // PORCENTAJE
         // =============================
         let porcentaje
-        if      (totalDescontables === 0) porcentaje = 100
+        if (totalDescontables === 0) porcentaje = 100
         else if (totalDescontables === 1) porcentaje = 70
         else if (totalDescontables === 2) porcentaje = 40
-        else                              porcentaje = 0
+        else porcentaje = 0
 
         return {
-            ausenciasPeriodo:    delPeriodo,
+            ausenciasPeriodo: delPeriodo,
             ausenciasHistoricas: historicas,
             detalle,
-            total_descontables:  totalDescontables,
+            total_descontables: totalDescontables,
             porcentaje,
         }
     }
