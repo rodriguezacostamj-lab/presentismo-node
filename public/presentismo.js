@@ -34,11 +34,11 @@ function inicializarTabla() {
             {
                 data: 'estado', className: 'text-center',
                 render: d => {
-                if (d === 'OK')          return '<span class="badge-ok">OK</span>'
-                if (d === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
-                if (d === 'NO_EXISTE')   return '<span class="badge-noexiste">No existe</span>'
-                return '—'
-            }
+                    if (d === 'OK') return '<span class="badge-ok">OK</span>'
+                    if (d === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
+                    if (d === 'NO_EXISTE') return '<span class="badge-noexiste">No existe</span>'
+                    return '—'
+                }
             },
             {
                 data: 'cuil', className: 'text-center',
@@ -120,7 +120,7 @@ async function calcular() {
         }
 
         const filas = data.resultados.map(r => {
-            resultadosCache[r.empleado.cuil] = r  
+            resultadosCache[r.empleado.cuil] = r
             return {
                 cuil: r.empleado.cuil,
                 nombre: r.empleado.nombre,
@@ -191,8 +191,8 @@ window.verDetalle = function (cuil) {
         tbPeriodo.innerHTML += `
             <tr>
                 <td>${a.codigo}</td>
-                <td>${a.nivel ?? '—'}</td>
-                <td>${a.vinculo ?? '—'}</td>
+                <td>${a.nivel && a.nivel !== 'null' ? a.nivel : ''}</td>
+                <td>${a.vinculo && a.vinculo !== 'null' ? a.vinculo : ''}</td>
                 <td>${formatearFecha(a.fechaDesde)}</td>
                 <td>${formatearFecha(a.fechaHasta)}</td>
                 <td class="text-center">${a.dias}</td>
@@ -207,8 +207,8 @@ window.verDetalle = function (cuil) {
         tbHistoricas.innerHTML += `
             <tr>
                 <td>${a.codigo}</td>
-                <td>${a.nivel ?? '—'}</td>
-                <td>${a.vinculo ?? '—'}</td>
+                <td>${a.nivel && a.nivel !== 'null' ? a.nivel : ''}</td>
+                <td>${a.vinculo && a.vinculo !== 'null' ? a.vinculo : ''}</td>
                 <td>${formatearFecha(a.fechaDesde)}</td>
                 <td>${formatearFecha(a.fechaHasta)}</td>
                 <td class="text-center">${a.dias}</td>
@@ -259,12 +259,12 @@ function mostrarSeccion(seccion, el) {
 $(document).ready(async () => {
     // Verificar si hay sesión activa
     const response = await fetch('/api/auth/me')
-    
+
     if (response.ok) {
         // Hay sesión activa, ocultar login
         document.getElementById('pantalla-login').style.display = 'none'
     }
-    
+
     inicializarTabla()
 })
 
@@ -630,7 +630,7 @@ window.crearRegla = crearRegla
 // AUTH
 // ================================
 async function iniciarSesion() {
-    const usuario  = document.getElementById('login-usuario').value.trim()
+    const usuario = document.getElementById('login-usuario').value.trim()
     const password = document.getElementById('login-password').value.trim()
     const errorDiv = document.getElementById('login-error')
 
@@ -642,9 +642,9 @@ async function iniciarSesion() {
 
     try {
         const response = await fetch('/api/auth/login', {
-            method:  'POST',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ usuario, password })
+            body: JSON.stringify({ usuario, password })
         })
 
         const data = await response.json()
