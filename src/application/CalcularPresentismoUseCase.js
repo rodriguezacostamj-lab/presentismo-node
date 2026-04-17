@@ -97,6 +97,40 @@ class CalcularPresentismoUseCase {
                 }
             })
         }
+        // 6. Agregar empleados de sueldos sin ausencias
+       for (const [cuil, infoSueldo] of Object.entries(sueldosPorCuil)) {
+       // Si ya fue procesado, saltarlo
+       if (resultados.some(r => r.empleado.cuil === cuil)) continue
+
+    const importeEsperado = basePremio100
+
+    resultados.push({
+        empleado: {
+            cuil,
+            nombre: infoSueldo.empleado ?? cuil,
+            funcionEjecutiva: false,
+            cargoMayor: false,
+            sinAusencias: true
+        },
+        resultado: {
+            porcentaje: 100,
+            total_descontables: 0,
+            detalle: [],
+            ausenciasPeriodo: [],
+            ausenciasHistoricas: []
+        },
+        premio: {
+            estado: comparador.compararPremio(importeEsperado, infoSueldo, false),
+            importe_esperado: importeEsperado,
+            importe_rrhh: infoSueldo?.importe_rrhh ?? null
+        },
+        alertas: {
+            sinAusencias: true,
+            cargo_mayor: false,
+            funcion_ejecutiva: false
+        }
+    })
+}
 
         return resultados
     }

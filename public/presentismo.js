@@ -20,6 +20,7 @@ function inicializarTabla() {
                     let badges = ''
                     if (r.funcionEjecutiva) badges += '<span class="badge-fe">FE</span> '
                     if (r.cargoMayor) badges += '<span class="badge-cmj">CMJ</span>'
+                    if (r.empleado.sinAusencias) badges += '<span class="badge-sinausencias">S/Ausencias</span>'
                     return badges || '—'
                 }
             },
