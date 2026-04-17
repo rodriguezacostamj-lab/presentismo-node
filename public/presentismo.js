@@ -20,7 +20,7 @@ function inicializarTabla() {
                     let badges = ''
                     if (r.funcionEjecutiva) badges += '<span class="badge-fe">FE</span> '
                     if (r.cargoMayor) badges += '<span class="badge-cmj">CMJ</span>'
-                    if (r.empleado.sinAusencias) badges += '<span class="badge-sinausencias">S/Ausencias</span>'
+                    if (r.sinAusencias) badges += '<span class="badge-sinausencias">S/Ausencias</span>'
                     return badges || '—'
                 }
             },
@@ -129,6 +129,7 @@ async function calcular() {
                 porcentaje: r.resultado.porcentaje,
                 funcionEjecutiva: r.empleado.funcionEjecutiva,
                 cargoMayor: r.empleado.cargoMayor,
+                sinAusencias: r.empleado.sinAusencias ?? false,
                 importeRrhh: r.premio?.importe_esperado ?? null,
                 importeEsperado: r.premio?.importe_rrhh ?? null,
                 estado: r.premio?.estado ?? null,
