@@ -66,23 +66,30 @@ class TipoAusencia {
     }
 
     #cumpleCondicion(ausencia, { campo, operador, valor }) {
-        const actual = {
-            discapacidad: ausencia.discapacidad,
-            edad:         ausencia.edad,
-            vinculo:      (ausencia.vinculo ?? '').toUpperCase(),
-            nivel:        (ausencia.nivel ?? '').toUpperCase().trim(),
-        }[campo]
+    const actual = {
+        discapacidad: ausencia.discapacidad,
+        edad:         ausencia.edad,
+        vinculo:      (ausencia.vinculo ?? '').toUpperCase(),
+        nivel:        (ausencia.nivel ?? '').toUpperCase().trim(),
+    }[campo]
 
-        const v = typeof valor === 'string' ? valor.toUpperCase() : valor
-
-        switch (operador) {
-            case '=':        return actual === v
-            case '>=':       return Number(actual) >= Number(v)
-            case '<=':       return Number(actual) <= Number(v)
-            case 'CONTIENE': return String(actual).includes(v)
-            default:         return false
-        }
+    // Normalizar valor: si es string 'true'/'false' convertir a boolean
+    let v = valor
+    if (campo === 'discapacidad') {
+        if (valor === 'true' || valor === true) v = true
+        if (valor === 'false' || valor === false) v = false
+    } else {
+        v = typeof valor === 'string' ? valor.toUpperCase() : valor
     }
+
+    switch (operador) {
+        case '=':        return actual === v
+        case '>=':       return Number(actual) >= Number(v)
+        case '<=':       return Number(actual) <= Number(v)
+        case 'CONTIENE': return String(actual).includes(String(v))
+        default:         return false
+    }
+}
     resolverDescripcion(ausencia) {
     const bloques = [...this.parametrosEspeciales].sort(
         (a, b) => (a.prioridad ?? 999) - (b.prioridad ?? 999)
