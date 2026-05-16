@@ -36,8 +36,7 @@ class LectorCSV {
             const fechaDesde = this.#parsearFecha(fila['FECHA_DESDE'])
             const fechaHasta = this.#parsearFecha(fila['FECHA_HASTA'])
 
-            console.log('DISC raw:', JSON.stringify(fila['DISC']))
-
+            
             const ausencia = new Ausencia({
                 codigo,
                 dias: 0, // se calcula en CalculadoraPresentismo
