@@ -44,7 +44,7 @@ class LectorCSV {
                 nivel: fila['AUSENCIA']?.trim() ?? null,
                 vinculo: fila['VINCULO']?.trim() ?? null,
                 edad: fila['EDAD'] ? parseInt(fila['EDAD']) : null,
-                discapacidad: fila['DISC'] === 'true' || fila['DISC'] === true,
+                discapacidad: fila['DISC']?.trim().toUpperCase() === 'SI',
                 causal: fila['CAUSAL']?.trim() ?? null,
             })
 
