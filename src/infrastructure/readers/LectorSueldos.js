@@ -35,32 +35,32 @@ class LectorSueldos {
     }
 
     #detectarHoja(workbook) {
-    const hojasValidas = []
+        const hojasValidas = []
 
-    for (const nombre of workbook.SheetNames) {
-        const hoja = workbook.Sheets[nombre]
-        const filas = XLSX.utils.sheet_to_json(hoja)
-        if (filas.length > 0) {
-            const columnas = Object.keys(filas[0]).map(c => c.toLowerCase())
-            if (columnas.includes('cuil') && columnas.includes('importe')) {
-                hojasValidas.push(nombre)
+        for (const nombre of workbook.SheetNames) {
+            const hoja = workbook.Sheets[nombre]
+            const filas = XLSX.utils.sheet_to_json(hoja)
+            if (filas.length > 0) {
+                const columnas = Object.keys(filas[0]).map(c => c.toLowerCase())
+                if (columnas.includes('cuil') && columnas.includes('importe')) {
+                    hojasValidas.push(nombre)
+                }
             }
         }
-    }
 
-    if (hojasValidas.length === 0) {
-        throw new Error('No se encontró una hoja con las columnas cuil e importe.')
-    }
+        if (hojasValidas.length === 0) {
+            throw new Error('No se encontró una hoja con las columnas cuil e importe.')
+        }
 
-    if (hojasValidas.length > 1) {
-        throw new Error(
-            `Se encontraron varias hojas válidas: ${hojasValidas.join(', ')}. ` +
-            `Eliminá las que no corresponden y volvé a intentarlo.`
-        )
-    }
+        if (hojasValidas.length > 1) {
+            throw new Error(
+                `Se encontraron varias hojas válidas: ${hojasValidas.join(', ')}. ` +
+                `Eliminá las que no corresponden y volvé a intentarlo.`
+            )
+        }
 
-    return hojasValidas[0]
-}
+        return hojasValidas[0]
+    }
 
     async #leerCSV(rutaArchivo) {
         const filas = await this.#parsearCSV(rutaArchivo)
@@ -72,9 +72,12 @@ class LectorSueldos {
 
         for (const fila of filas) {
             // Buscar columnas sin importar mayúsculas
-            const cuil     = this.#obtenerValor(fila, 'cuil')?.trim()
-            const empleado = this.#obtenerValor(fila, 'empleado')?.trim()
-            const importe  = this.#parsearImporte(this.#obtenerValor(fila, 'importe'))
+            const cuil = this.#obtenerValor(fila, 'cuil')?.trim()
+            const empleado =
+                this.#obtenerValor(fila, 'apellido_nombre') ??
+                this.#obtenerValor(fila, 'nombre') ??
+                this.#obtenerValor(fila, 'empleado')
+            const importe = this.#parsearImporte(this.#obtenerValor(fila, 'importe'))
 
             if (!cuil || isNaN(importe)) continue
 
@@ -99,20 +102,20 @@ class LectorSueldos {
     }
 
     #parsearCSV(rutaArchivo) {
-    return new Promise((resolve, reject) => {
-        const registros = []
+        return new Promise((resolve, reject) => {
+            const registros = []
 
-        fs.createReadStream(rutaArchivo, { encoding: 'utf8' })
-            .pipe(parse({
-                columns:   true,
-                trim:      true,
-                delimiter: ';'
-            }))
-            .on('data',  fila => registros.push(fila))
-            .on('end',   ()   => resolve(registros))
-            .on('error', err  => reject(err))
-    })
-}
+            fs.createReadStream(rutaArchivo, { encoding: 'utf8' })
+                .pipe(parse({
+                    columns: true,
+                    trim: true,
+                    delimiter: ';'
+                }))
+                .on('data', fila => registros.push(fila))
+                .on('end', () => resolve(registros))
+                .on('error', err => reject(err))
+        })
+    }
 }
 
 module.exports = LectorSueldos
