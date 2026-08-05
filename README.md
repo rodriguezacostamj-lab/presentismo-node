@@ -1,5 +1,6 @@
 # Sistema de Gestión de Presentismo — Node.js
 ![Tests](https://github.com/rodriguezacostamj-lab/presentismo-node/actions/workflows/tests.yml/badge.svg)
+> ✅ En producción — Sistema en uso activo para ~1.000 empleados | 32 tests | CI/CD con GitHub Actions | Deploy en Render
 
 Migración del sistema de auditoría de presentismo de PHP a Node.js. API REST con arquitectura hexagonal que procesa reportes de ausencias y sueldos, calcula el premio presentismo por empleado y detecta errores de liquidación automáticamente.
 
@@ -86,8 +87,10 @@ El porcentaje final se determina así:
 
 - Node.js
 - Express
-- SQLite (autenticación + configuración de reglas)
+- PostgreSQL (autenticación + configuración de reglas) · Deploy en Render
 - Bootstrap 5 + DataTables
+- Jest (32 tests)
+- GitHub Actions CI/CD
 - Arquitectura hexagonal (domain, application, infrastructure, interfaces)
 
 ---
@@ -105,11 +108,13 @@ cd presentismo-node
 npm install
 ```
 
-3. Copiar la base de datos SQLite a la carpeta `data/`:
-```bash
-mkdir data
-cp /ruta/de/presentismo.db data/
+3. Configurar variables de entorno — crear un archivo `.env` en la raíz:
+```env
+DATABASE_URL=postgresql://usuario:password@host:puerto/nombre_db
+SESSION_SECRET=tu_secreto
 ```
+
+Después guardás con "Commit changes" y listo.
 
 4. Iniciar el servidor:
 ```bash
@@ -223,7 +228,6 @@ presentismo-node/
 │       ├── middlewares/     # authMiddleware
 │       └── routes/          # auth, presentismo, reglas
 ├── public/                  # Frontend HTML + JS
-├── data/                    # Base de datos SQLite
 ├── uploads/                 # Archivos temporales
 └── package.json
 ```
@@ -233,16 +237,18 @@ presentismo-node/
 ## Decisiones técnicas
 
 **Arquitectura hexagonal**
-El dominio no depende de ninguna capa externa. Express, SQLite y los lectores de archivos son detalles intercambiables. Si mañana se cambia la base de datos, solo se modifica la capa de infraestructura.
+El dominio no depende de ninguna capa externa. Express, PostgreSQL y los lectores de archivos son detalles intercambiables. Si mañana se cambia la base de datos, solo se modifica la capa de infraestructura.
 
 **Migración de PHP a Node.js**
 Este proyecto es la migración de un sistema existente en PHP con arquitectura MVC. El mayor desafío fue adaptar el modelo síncrono de PHP al modelo asíncrono de Node.js con async/await, manteniendo la lógica de negocio intacta.
 
 **Reglas configurables desde la interfaz**
-Las reglas de ausencias y sus condiciones especiales se almacenan en SQLite como JSON. Esto permite que el sistema se adapte a cambios en la normativa sin modificar el código.
+Las reglas de ausencias y sus condiciones especiales se almacenan en PostgreSQL. Esto permite que el sistema se adapte a cambios en la normativa sin modificar el código.
 
 **Procesamiento en memoria**
-Todos los cálculos se realizan en memoria a partir de los archivos CSV cargados. SQLite se usa exclusivamente para autenticación y configuración.
+Todos los cálculos se realizan en memoria a partir de los archivos CSV cargados. 
+PostgreSQL se usa exclusivamente para autenticación y configuración de reglas, 
+con deploy en Render y base de datos en la nube.
 
 **Detección automática de columnas en sueldos**
 El lector de sueldos acepta CSV y Excel. Detecta automáticamente la hoja correcta por contenido y mapea las columnas por nombre en lugar de por posición.
