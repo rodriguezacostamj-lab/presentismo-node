@@ -1,6 +1,6 @@
 # Sistema de Gestión de Presentismo — Node.js
 ![Tests](https://github.com/rodriguezacostamj-lab/presentismo-node/actions/workflows/tests.yml/badge.svg)
-> ✅ En producción — Sistema en uso activo para ~1.000 empleados | 32 tests | CI/CD con GitHub Actions | Deploy en Render
+> ✅ En producción — Sistema en uso activo para ~1.000 empleados | 32 tests | CI/CD con GitHub Actions | Deploy en Render · Base de datos en Neon
 
 Migración del sistema de auditoría de presentismo de PHP a Node.js. API REST con arquitectura hexagonal que procesa reportes de ausencias y sueldos, calcula el premio presentismo por empleado y detecta errores de liquidación automáticamente.
 
@@ -87,11 +87,33 @@ El porcentaje final se determina así:
 
 - Node.js
 - Express
-- PostgreSQL (autenticación + configuración de reglas) · Deploy en Render
+- PostgreSQL en Neon (autenticación + configuración de reglas) · Deploy en Render
 - Bootstrap 5 + DataTables
 - Jest (32 tests)
 - GitHub Actions CI/CD
 - Arquitectura hexagonal (domain, application, infrastructure, interfaces)
+
+---
+
+## Base de datos
+
+La base vive en [Neon](https://neon.tech) (PostgreSQL) y guarda solo configuración: reglas de ausencias, sus condiciones especiales, el valor base del presentismo y el usuario admin. No hay datos que se acumulen mes a mes — todo el procesamiento de ausencias y sueldos es en memoria a partir de los CSV/Excel cargados en cada uso, así que la base cambia poco (solo cuando se edita algo desde la interfaz).
+
+**Migrar o respaldar la base** (`scripts/migrate-postgres.js`)
+
+Copia esquema y datos de una base Postgres a otra. Sirve tanto para migrar de proveedor el día de mañana como para sacar un respaldo manual antes de un cambio grande:
+
+```bash
+$env:SOURCE_DATABASE_URL = "postgresql://.../db-actual"
+$env:DEST_DATABASE_URL   = "postgresql://.../db-nueva"
+node scripts/migrate-postgres.js
+```
+
+Es seguro correrlo más de una vez (usa `ON CONFLICT DO NOTHING`, no duplica ni pisa filas) y no modifica ni borra nada en el origen.
+
+**Recrear la base desde cero** (`scripts/migrate.js`)
+
+Crea las tablas y carga los datos semilla (reglas base, parámetro de presentismo). Útil para armar una base nueva desde cero, no para respaldar una base en uso ya que no refleja ediciones hechas desde la interfaz.
 
 ---
 
@@ -110,11 +132,9 @@ npm install
 
 3. Configurar variables de entorno — crear un archivo `.env` en la raíz:
 ```env
-DATABASE_URL=postgresql://usuario:password@host:puerto/nombre_db
+DATABASE_URL=postgresql://usuario:password@host.neon.tech/nombre_db
 SESSION_SECRET=tu_secreto
 ```
-
-Después guardás con "Commit changes" y listo.
 
 4. Iniciar el servidor:
 ```bash
@@ -222,7 +242,7 @@ presentismo-node/
 │   │   └── CalcularPresentismoUseCase.js
 │   ├── infrastructure/
 │   │   ├── readers/         # LectorCSV, LectorSueldos
-│   │   └── persistence/     # SQLiteConnection, ReglaRepository
+│   │   └── persistence/     # PostgresConnection, ReglaRepository
 │   └── interfaces/
 │       ├── controllers/     # AuthController, PresentismoController, ReglasController
 │       ├── middlewares/     # authMiddleware
@@ -247,8 +267,8 @@ Las reglas de ausencias y sus condiciones especiales se almacenan en PostgreSQL.
 
 **Procesamiento en memoria**
 Todos los cálculos se realizan en memoria a partir de los archivos CSV cargados. 
-PostgreSQL se usa exclusivamente para autenticación y configuración de reglas, 
-con deploy en Render y base de datos en la nube.
+PostgreSQL se usa exclusivamente para autenticación y configuración de reglas 
+(usuarios y reglas de ausencias), con deploy de la app en Render y base de datos en Neon.
 
 **Detección automática de columnas en sueldos**
 El lector de sueldos acepta CSV y Excel. Detecta automáticamente la hoja correcta por contenido y mapea las columnas por nombre en lugar de por posición.

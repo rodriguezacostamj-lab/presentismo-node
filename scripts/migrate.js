@@ -166,9 +166,9 @@ async function migrar() {
         // =============================================
 
         console.log('\n⚠️  El usuario admin necesita su password hash.')
-        console.log('   Corré este comando para obtenerlo:')
-        console.log('   node -e "const D=require(\'better-sqlite3\');const db=new D(\'data/presentismo.db\');console.log(db.prepare(\'SELECT password FROM usuarios WHERE usuario=\\\'admin\\\'\').get())"')
-        console.log('   Luego pegalo en la variable ADMIN_HASH de este script y volvé a correr.\n')
+        console.log('   Corré este comando para generar uno nuevo (reemplazá "tu_password"):')
+        console.log('   node -e "console.log(require(\'bcrypt\').hashSync(\'tu_password\', 10))"')
+        console.log('   Luego seteá esa variable como ADMIN_HASH y volvé a correr este script.\n')
 
         const ADMIN_HASH = process.env.ADMIN_HASH || null
 
