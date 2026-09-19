@@ -559,7 +559,23 @@
                         <button class="btn btn-sm btn-outline-secondary" onclick="toggleReglasAplicadas()">
                             Ver reglas aplicadas
                         </button>
-                        <pre id="hist-reglas-aplicadas" class="mt-2 p-2 bg-light rounded small" style="display:none;max-height:200px;overflow:auto;"></pre>
+                        <div id="hist-reglas-aplicadas" style="display:none;" class="mt-2">
+                            <table class="table table-sm table-bordered" style="font-size:0.78rem;">
+                                <thead style="background-color:#f0f0f0;">
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Ausencia</th>
+                                        <th class="text-center">Descuenta</th>
+                                        <th class="text-center">Tope</th>
+                                        <th class="text-center">Corta</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="hist-reglas-tbody"></tbody>
+                            </table>
+                            <div class="text-muted small">
+                                <strong>Valor premio base:</strong> <span id="hist-reglas-premio"></span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
