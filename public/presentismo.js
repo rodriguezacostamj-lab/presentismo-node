@@ -764,21 +764,27 @@ async function verDetalleCierre(id) {
         document.getElementById('hist-det-valor').textContent = `$${Number(c.valor_premio).toLocaleString('es-AR')}`
         document.getElementById('hist-det-fecha').textContent = formatearFechaHora(c.fecha_cierre)
         document.getElementById('hist-det-edicion').textContent = c.fecha_ultima_edicion ? formatearFechaHora(c.fecha_ultima_edicion) : '—'
-        // Renderizar tabla de reglas aplicadas
+        // Renderizar tabla de reglas especiales
         const reglas = c.reglas_aplicadas?.reglas ?? []
+        const especiales = reglas.filter(r => r.parametrosEspeciales?.length > 0)
         const tbody = document.getElementById('hist-reglas-tbody')
-        tbody.innerHTML = reglas.map(r => `
-            <tr>
-                <td>${r.codigo}</td>
-                <td>${r.nombre}</td>
-                <td class="text-center">${r.descuenta ? '✔' : '✖'}</td>
-                <td class="text-center">${r.diasTope > 0 ? r.diasTope : '—'}</td>
-                <td class="text-center">${r.corta ? '✔' : '—'}</td>
-            </tr>
-        `).join('')
-        const valorPremio = c.reglas_aplicadas?.parametros?.presentismo_base
-        document.getElementById('hist-reglas-premio').textContent =
-            valorPremio ? `$${Number(valorPremio).toLocaleString('es-AR')}` : '—'
+        const filas = []
+        for (const r of especiales) {
+            for (const bloque of r.parametrosEspeciales) {
+                const cond = bloque.condiciones?.[0]
+                const condTexto = cond ? `${cond.campo} ${cond.operador} ${cond.valor}` : '—'
+                filas.push(`
+                    <tr>
+                        <td>${r.codigo}</td>
+                        <td>${r.nombre}</td>
+                        <td>${bloque.descripcion ?? '—'}</td>
+                        <td class="text-center">${bloque.tope}</td>
+                        <td class="text-muted">${condTexto}</td>
+                    </tr>
+                `)
+            }
+        }
+        tbody.innerHTML = filas.length ? filas.join('') : '<tr><td colspan="5" class="text-muted text-center">Sin reglas especiales</td></tr>'
         document.getElementById('hist-reglas-aplicadas').style.display = 'none'
 
         renderResultadosCierre(data.resultados)
