@@ -4,7 +4,7 @@ let periodosCache = {}
 
 const fmtPesos = v => v != null
     ? '$\u00A0' + Number(v).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    : '—'
+    : '<span class="text-muted" style="font-size:0.7rem;letter-spacing:.05em;">s/d</span>'
 
 // Inicializar DataTable
 function inicializarTabla() {
@@ -42,7 +42,7 @@ function inicializarTabla() {
                     if (d === 'OK') return '<span class="badge-ok">OK</span>'
                     if (d === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
                     if (d === 'NO_EXISTE') return '<span class="badge-noexiste">No existe</span>'
-                    return '—'
+                    return ''
                 }
             },
             {
@@ -784,10 +784,10 @@ function renderHistorialEmpleado(resultados) {
                     if (d === 'OK')          return '<span class="badge-ok">OK</span>'
                     if (d === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
                     if (d === 'NO_EXISTE')   return '<span class="badge-noexiste">No existe</span>'
-                    return '—'
+                    return ''
                 }
             },
-            { data: 'observaciones', render: d => `<span class="text-muted small">${d || '—'}</span>` },
+            { data: 'observaciones', render: d => d ? `<span class="text-muted small">${d}</span>` : '' },
             {
                 data: null, className: 'text-center', orderable: false,
                 render: (d, t, r) => `
@@ -950,7 +950,7 @@ function renderResultadosCierre(resultados) {
                     if (d === 'OK')          return '<span class="badge-ok">OK</span>'
                     if (d === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
                     if (d === 'NO_EXISTE')   return '<span class="badge-noexiste">No existe</span>'
-                    return '—'
+                    return ''
                 }
             },
             {
