@@ -801,19 +801,40 @@ function renderResultadosCierre(resultados) {
     tbody.innerHTML = ''
 
     for (const r of resultados) {
+        const premio  = r.detalle?.premio  ?? {}
+        const alertas = r.detalle?.alertas ?? {}
+
+        let badgesHtml = ''
+        if (alertas.funcion_ejecutiva) badgesHtml += '<span class="badge-fe">FE</span> '
+        if (alertas.cargo_mayor)       badgesHtml += '<span class="badge-cmj">CMJ</span> '
+        if (alertas.sinAusencias)      badgesHtml += '<span class="badge-sinausencias">S/Ausencias</span>'
+
+        const estadoHtml = premio.estado === 'OK'
+            ? '<span class="badge-ok">OK</span>'
+            : premio.estado === 'NO_COINCIDE'
+                ? '<span class="badge-revisar">Revisar</span>'
+                : premio.estado === 'NO_EXISTE'
+                    ? '<span class="badge-noexiste">No existe</span>'
+                    : '—'
+
+        const fmt = v => v != null ? '$' + Number(v).toLocaleString('es-AR') : '—'
+
         tbody.innerHTML += `
             <tr>
                 <td>${r.cuil}</td>
                 <td>${r.nombre_empleado}</td>
                 <td class="text-center">${r.dias_presentismo}</td>
                 <td class="text-center"><strong>${r.porcentaje_calculado}%</strong></td>
-                <td>${r.monto != null ? '$' + Number(r.monto).toLocaleString('es-AR') : '—'}</td>
-                <td class="text-muted small" style="max-width:200px;white-space:normal;">${r.observaciones || '—'}</td>
-                <td><button class="btn-ver"
+                <td class="text-center">${badgesHtml || '—'}</td>
+                <td>${fmt(premio.importe_esperado)}</td>
+                <td>${fmt(premio.importe_rrhh)}</td>
+                <td class="text-center">${estadoHtml}</td>
+                <td class="text-muted small" style="max-width:180px;white-space:normal;">${r.observaciones || '—'}</td>
+                <td class="text-center"><button class="btn-ver"
                     data-id="${r.id}"
                     data-nombre="${r.nombre_empleado.replace(/"/g, '&quot;')}"
                     data-obs="${(r.observaciones || '').replace(/"/g, '&quot;')}"
-                    onclick="abrirModalObservaciones(this)">Observaciones</button></td>
+                    onclick="abrirModalObservaciones(this)">Obs.</button></td>
             </tr>
         `
     }
