@@ -241,6 +241,19 @@
         }
         .sidebar-logout:hover { color: #fff !important; }
 
+        /* Cabecera de cards historial */
+        .card-header-hist {
+            background-color: #DDE7EF;
+            border-bottom: 1px solid #c4d4df;
+            padding: 9px 16px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: .07em;
+            color: #2c3e50;
+            text-transform: uppercase;
+            border-radius: 0 !important;
+        }
+
         /* Historial: cabecera de card refinada */
         .hist-card-label {
             font-size: 0.7rem;
@@ -573,8 +586,8 @@
 
         <!-- Filtros -->
         <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h6 class="card-title mb-3">🔍 FILTROS</h6>
+            <div class="card-header-hist">Filtros de búsqueda</div>
+            <div class="card-body pt-3">
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label small">Nombre del agente</label>
@@ -603,8 +616,8 @@
 
         <!-- Vista historial por empleado (solo cuando se busca por nombre) -->
         <div id="hist-vista-empleado" style="display:none;" class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h6 class="card-title mb-3">HISTORIAL DEL AGENTE</h6>
+            <div class="card-header-hist">Historial del agente</div>
+            <div class="card-body pt-3">
                 <table id="tabla-hist-empleado" class="table table-sm table-hover w-100">
                     <thead>
                         <tr>
@@ -628,8 +641,8 @@
 
         <!-- Tabla de cierres -->
         <div id="hist-vista-cierres" class="card shadow-sm mb-4">
-            <div class="card-body">
-                <h6 class="card-title mb-3">CIERRES DE PERÍODO</h6>
+            <div class="card-header-hist">Cierres de período</div>
+            <div class="card-body pt-3">
                 <table id="tabla-historial" class="table table-sm table-hover w-100">
                     <thead>
                         <tr>
@@ -651,7 +664,8 @@
         <!-- Detalle del cierre seleccionado -->
         <div id="hist-detalle" style="display:none">
             <div class="card shadow-sm mb-3">
-                <div class="card-body">
+                <div class="card-header-hist">Detalle del período</div>
+                <div class="card-body pt-3">
                     <div class="row g-3 mb-3">
                         <div class="col-md-4">
                             <div class="hist-card-label">Período presentismo</div>
@@ -679,8 +693,8 @@
                         </div>
                     </div>
                     <div>
-                        <button class="btn btn-sm btn-outline-secondary" style="font-size:0.78rem;" onclick="toggleReglasAplicadas()">
-                            <i class="bi bi-table me-1"></i>Ver reglas aplicadas
+                        <button class="btn btn-sm" style="background-color:#0b1738;color:white;font-size:0.78rem;" onclick="toggleReglasAplicadas()">
+                            Ver reglas aplicadas
                         </button>
                         <div id="hist-reglas-aplicadas" style="display:none;" class="mt-2">
                             <table class="table table-sm table-bordered" style="font-size:0.78rem;">
@@ -701,8 +715,8 @@
             </div>
 
             <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h6 class="card-title mb-3">RESULTADOS POR AGENTE</h6>
+                <div class="card-header-hist">Resultados por agente</div>
+                <div class="card-body pt-3">
                     <table id="tabla-hist-resultados" class="table table-sm table-hover w-100">
                         <thead>
                             <tr>
