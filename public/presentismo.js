@@ -2,6 +2,10 @@ let tabla = null
 let resultadosCache = {}
 let periodosCache = {}
 
+const fmtPesos = v => v != null
+    ? '$\u00A0' + Number(v).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : '—'
+
 // Inicializar DataTable
 function inicializarTabla() {
     tabla = $('#tabla-resultados').DataTable({
@@ -739,8 +743,6 @@ async function cargarHistorial() {
 let tablaHistEmpleado = null
 
 function renderHistorialEmpleado(resultados) {
-    const fmt = v => v != null ? '$' + Number(v).toLocaleString('es-AR') : '—'
-
     resultadosHistorialCache = {}
     const filas = resultados.map(r => {
         resultadosHistorialCache[r.id] = r
@@ -756,8 +758,8 @@ function renderHistorialEmpleado(resultados) {
             periodo_pres:    `${formatearFecha(r.periodo_presentismo_desde)} — ${formatearFecha(r.periodo_presentismo_hasta)}`,
             dias:            r.dias_presentismo,
             porcentaje:      r.porcentaje_calculado,
-            _fmt_rrhh:       fmt(premio.importe_esperado),
-            _fmt_sueldos:    fmt(premio.importe_rrhh),
+            _fmt_rrhh:       fmtPesos(premio.importe_esperado),
+            _fmt_sueldos:    fmtPesos(premio.importe_rrhh),
             estado:          premio.estado ?? null,
             observaciones:   r.observaciones || '',
         }
@@ -789,13 +791,13 @@ function renderHistorialEmpleado(resultados) {
             {
                 data: null, className: 'text-center', orderable: false,
                 render: (d, t, r) => `
-                    <button class="btn-ver" style="margin-right:3px;"
-                        data-id="${r._id}" onclick="abrirDetalleHistorial(this)">Ver</button>
-                    <button class="btn-ver" style="background-color:#6c757d;"
+                    <button class="btn-icon btn-icon-primary me-1" title="Ver detalle"
+                        data-id="${r._id}" onclick="abrirDetalleHistorial(this)"><i class="bi bi-eye"></i></button>
+                    <button class="btn-icon btn-icon-secondary" title="Observaciones"
                         data-id="${r._id}"
                         data-nombre="${r._nombre_raw.replace(/"/g, '&quot;')}"
                         data-obs="${r._obs_raw.replace(/"/g, '&quot;')}"
-                        onclick="abrirModalObservaciones(this)">Obs.</button>`
+                        onclick="abrirModalObservaciones(this)"><i class="bi bi-pencil-square"></i></button>`
             }
         ],
         language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
@@ -826,8 +828,8 @@ function renderTablaHistorial(cierres) {
                 <td><span class="badge" style="background-color:${badgeColor};color:${c.estado === 'editado' ? 'black' : 'white'};font-size:0.7rem;">${badgeText}</span></td>
                 <td>$${Number(c.valor_premio).toLocaleString('es-AR')}</td>
                 <td>
-                    <button class="btn-ver" style="margin-right:3px;" onclick="verDetalleCierre(${c.id})">Ver detalle</button>
-                    <button class="btn-ver" style="background-color:#dc3545;" onclick="eliminarCierre(${c.id}, '${c.periodo_liquidacion}')">Eliminar</button>
+                    <button class="btn-icon btn-icon-primary me-1" title="Ver detalle" onclick="verDetalleCierre(${c.id})"><i class="bi bi-eye"></i></button>
+                    <button class="btn-icon btn-icon-danger" title="Eliminar" onclick="eliminarCierre(${c.id}, '${c.periodo_liquidacion}')"><i class="bi bi-trash3"></i></button>
                 </td>
             </tr>
         `
@@ -854,7 +856,7 @@ async function verDetalleCierre(id) {
             c.estado === 'editado'
                 ? '<span class="badge-revisar">Editado</span>'
                 : '<span class="badge-ok">Exportado</span>'
-        document.getElementById('hist-det-valor').textContent = `$${Number(c.valor_premio).toLocaleString('es-AR')}`
+        document.getElementById('hist-det-valor').textContent = fmtPesos(c.valor_premio)
         document.getElementById('hist-det-fecha').textContent = formatearFechaHora(c.fecha_cierre)
         document.getElementById('hist-det-edicion').textContent = c.fecha_ultima_edicion ? formatearFechaHora(c.fecha_ultima_edicion) : '—'
         // Renderizar tabla de reglas especiales
@@ -890,8 +892,6 @@ async function verDetalleCierre(id) {
 }
 
 function renderResultadosCierre(resultados) {
-    const fmt = v => v != null ? '$' + Number(v).toLocaleString('es-AR') : '—'
-
     resultadosHistorialCache = {}
     const filas = resultados.map(r => {
         resultadosHistorialCache[r.id] = r
@@ -912,8 +912,8 @@ function renderResultadosCierre(resultados) {
             importe_sueldos:  premio.importe_rrhh ?? null,
             estado:           premio.estado ?? null,
             observaciones:    r.observaciones || '',
-            _fmt_rrhh:        fmt(premio.importe_esperado),
-            _fmt_sueldos:     fmt(premio.importe_rrhh),
+            _fmt_rrhh:        fmtPesos(premio.importe_esperado),
+            _fmt_sueldos:     fmtPesos(premio.importe_rrhh),
         }
     })
 
@@ -960,13 +960,13 @@ function renderResultadosCierre(resultados) {
             {
                 data: null, className: 'text-center', orderable: false,
                 render: (d, t, r) => `
-                    <button class="btn-ver" style="margin-right:3px;"
-                        data-id="${r._id}" onclick="abrirDetalleHistorial(this)">Ver</button>
-                    <button class="btn-ver" style="background-color:#6c757d;"
+                    <button class="btn-icon btn-icon-primary me-1" title="Ver detalle"
+                        data-id="${r._id}" onclick="abrirDetalleHistorial(this)"><i class="bi bi-eye"></i></button>
+                    <button class="btn-icon btn-icon-secondary" title="Observaciones"
                         data-id="${r._id}"
                         data-nombre="${r._nombre_raw.replace(/"/g, '&quot;')}"
                         data-obs="${r._obs_raw.replace(/"/g, '&quot;')}"
-                        onclick="abrirModalObservaciones(this)">Obs.</button>`
+                        onclick="abrirModalObservaciones(this)"><i class="bi bi-pencil-square"></i></button>`
             }
         ],
         language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
