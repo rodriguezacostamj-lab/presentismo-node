@@ -47,7 +47,7 @@ function inicializarTabla() {
             },
             {
                 data: 'cuil', className: 'text-center',
-                render: d => `<button class="btn-ver" onclick="verDetalle('${d}')">Ver más</button>`
+                render: d => `<button class="btn-icon" onclick="verDetalle('${d}')" title="Ver detalle"><i class="bi bi-eye"></i></button>`
             }
         ],
         language: {
@@ -872,7 +872,7 @@ async function verDetalleCierre(id) {
                     <tr>
                         <td>${r.codigo}</td>
                         <td>${r.nombre}</td>
-                        <td>${bloque.descripcion ?? '—'}</td>
+                        <td>${bloque.descripcion ?? ''}</td>
                         <td class="text-center">${bloque.tope}</td>
                         <td class="text-muted">${condTexto}</td>
                     </tr>
@@ -955,7 +955,7 @@ function renderResultadosCierre(resultados) {
             },
             {
                 data: 'observaciones',
-                render: d => `<span class="text-muted small">${d || '—'}</span>`
+                render: d => d ? `<span class="text-muted small">${d}</span>` : ''
             },
             {
                 data: null, className: 'text-center', orderable: false,
