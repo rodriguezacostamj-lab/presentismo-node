@@ -176,7 +176,7 @@
             border-radius: 4px !important;
             border: none !important;
             font-size: 0.75rem !important;
-            color: #6c757d !important;
+            color: #0b1738 !important;
         }
         .dataTables_wrapper .dataTables_paginate .paginate_button.current,
         .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
@@ -455,16 +455,16 @@
 
             <!-- Tabla resultados -->
             <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="card-title mb-0"><i class="bi bi-people-fill me-2"></i>Listado de Agentes</h6>
-                        <div class="d-flex gap-2">
-                            <button id="btn-cerrar-periodo" class="btn btn-sm" style="background-color:#0b1738;color:white;" onclick="cerrarPeriodo()" disabled>
-                                Cerrar período
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="limpiar()">Limpiar cálculo</button>
-                        </div>
+                <div class="card-header-hist d-flex justify-content-between align-items-center" style="text-transform:none;">
+                    <span style="text-transform:uppercase;font-size:0.72rem;font-weight:700;letter-spacing:.07em;"><i class="bi bi-people-fill me-2"></i>Listado de Agentes</span>
+                    <div class="d-flex gap-2">
+                        <button id="btn-cerrar-periodo" class="btn btn-sm" style="background-color:#0b1738;color:white;font-size:0.75rem;" onclick="cerrarPeriodo()" disabled>
+                            Cerrar período
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" style="font-size:0.75rem;" onclick="limpiar()">Limpiar cálculo</button>
                     </div>
+                </div>
+                <div class="card-body pt-3">
                     <table id="tabla-resultados" class="table table-hover table-sm w-100">
                         <thead>
                             <tr>
@@ -493,7 +493,8 @@
 
             <!-- Valor base -->
             <div class="card shadow-sm mb-4">
-                <div class="card-body">
+                <div class="card-header-hist">Valor del Premio</div>
+                <div class="card-body pt-2">
                     <div class="d-flex align-items-center gap-3">
                         <button class="btn btn-sm" style="background-color:#0b1738;color:white;"
                             onclick="abrirModalNuevaRegla()">
@@ -513,7 +514,8 @@
 
             <!-- Tabla de reglas -->
             <div class="card shadow-sm">
-                <div class="card-body">
+                <div class="card-header-hist">Parámetros de Ausencias</div>
+                <div class="card-body pt-3">
                     <table id="tabla-reglas" class="table table-sm table-hover w-100">
                         <thead>
                             <tr>
@@ -542,8 +544,8 @@
 
             <!-- Resumen -->
             <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-3">RESUMEN DEL PERÍODO</h6>
+                <div class="card-header-hist">Resumen del período</div>
+                <div class="card-body pt-3">
                     <p><strong>Período de presentismo:</strong> <span id="det-periodo-pres"></span></p>
                     <p><strong>Período de liquidación:</strong> <span id="det-periodo-liq"></span></p>
                     <p><strong>Empleado:</strong> <span id="det-nombre"></span></p>
@@ -555,8 +557,8 @@
 
             <!-- Detalle de ausencias -->
             <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-3">DETALLE DE AUSENCIAS PARA EL PRESENTISMO</h6>
+                <div class="card-header-hist">Detalle de ausencias para el presentismo</div>
+                <div class="card-body pt-3">
                     <table id="tabla-detalle" class="table table-sm table-hover w-100">
                         <thead>
                             <tr>
@@ -582,8 +584,8 @@
 
             <!-- Ausencias del período -->
             <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-3">AUSENCIAS DEL PERÍODO</h6>
+                <div class="card-header-hist">Ausencias del período</div>
+                <div class="card-body pt-3">
                     <table class="table table-sm table-hover w-100">
                         <thead>
                             <tr>
@@ -602,8 +604,8 @@
 
             <!-- Ausencias anteriores -->
             <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <h6 class="fw-bold mb-3">AUSENCIAS ANTERIORES</h6>
+                <div class="card-header-hist">Ausencias anteriores</div>
+                <div class="card-body pt-3">
                     <table class="table table-sm table-hover w-100">
                         <thead>
                             <tr>
