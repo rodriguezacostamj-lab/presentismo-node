@@ -233,6 +233,39 @@ class PostgresConnection {
         return rows
     }
 
+    async buscarResultadosPorEmpleado({ nombre, periodoLiq, estado } = {}) {
+        const condiciones = ['rc.nombre_empleado ILIKE $1']
+        const valores = [`%${nombre}%`]
+        let idx = 2
+
+        if (periodoLiq) {
+            condiciones.push(`cp.periodo_liquidacion = $${idx++}`)
+            valores.push(periodoLiq)
+        }
+        if (estado) {
+            condiciones.push(`cp.estado = $${idx++}`)
+            valores.push(estado)
+        }
+
+        const { rows } = await this.pool.query(`
+            SELECT
+                rc.id, rc.cuil, rc.nombre_empleado,
+                rc.dias_presentismo, rc.porcentaje_calculado,
+                rc.monto, rc.detalle, rc.observaciones,
+                cp.id              AS cierre_id,
+                cp.periodo_presentismo_desde,
+                cp.periodo_presentismo_hasta,
+                cp.periodo_liquidacion,
+                cp.fecha_cierre,
+                cp.estado          AS cierre_estado
+            FROM resultados_calculo rc
+            JOIN cierres_periodo cp ON rc.cierre_id = cp.id
+            WHERE ${condiciones.join(' AND ')}
+            ORDER BY cp.fecha_cierre DESC
+        `, valores)
+        return rows
+    }
+
     async eliminarCierre(id) {
         await this.pool.query(`DELETE FROM resultados_calculo WHERE cierre_id = $1`, [id])
         await this.pool.query(`DELETE FROM cierres_periodo WHERE id = $1`, [id])

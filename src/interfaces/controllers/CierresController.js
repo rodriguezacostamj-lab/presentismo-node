@@ -48,6 +48,24 @@ class CierresController {
         }
     }
 
+    async buscarEmpleado(req, res) {
+        try {
+            const { nombre, periodo_liq, estado } = req.query
+            if (!nombre || nombre.trim().length < 2) {
+                return res.status(400).json({ error: 'Ingresá al menos 2 caracteres para buscar.' })
+            }
+            const repo = this.#repo()
+            const resultados = await repo.buscarPorEmpleado({
+                nombre:    nombre.trim(),
+                periodoLiq: periodo_liq || null,
+                estado:    estado || null
+            })
+            return res.json({ resultados })
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
+
     async eliminar(req, res) {
         try {
             const id = parseInt(req.params.id)

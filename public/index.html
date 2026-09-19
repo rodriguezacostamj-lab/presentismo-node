@@ -492,9 +492,9 @@
             <div class="card-body">
                 <h6 class="card-title mb-3">🔍 FILTROS</h6>
                 <div class="row g-3">
-                    <div class="col-md-3">
-                        <label class="form-label small">Período presentismo (YYYY o YYYY-MM)</label>
-                        <input type="text" id="hist-pres" class="form-control form-control-sm" placeholder="ej. 2026 o 2026-01">
+                    <div class="col-md-4">
+                        <label class="form-label small">Nombre del agente</label>
+                        <input type="text" id="hist-nombre" class="form-control form-control-sm" placeholder="Busca el historial de un agente en todos los períodos">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label small">Período liquidación (YYYY-MM)</label>
@@ -517,8 +517,33 @@
             </div>
         </div>
 
+        <!-- Vista historial por empleado (solo cuando se busca por nombre) -->
+        <div id="hist-vista-empleado" style="display:none;" class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h6 class="card-title mb-3">HISTORIAL DEL AGENTE</h6>
+                <table id="tabla-hist-empleado" class="table table-sm table-hover w-100">
+                    <thead>
+                        <tr>
+                            <th>CUIL</th>
+                            <th>NOMBRE</th>
+                            <th>Período liq.</th>
+                            <th>Período presentismo</th>
+                            <th class="text-center">DÍAS DESC.</th>
+                            <th class="text-center">%</th>
+                            <th>$ RRHH</th>
+                            <th>$ SUELDOS</th>
+                            <th class="text-center">ESTADO</th>
+                            <th>OBSERVACIONES</th>
+                            <th class="text-center">ACCIÓN</th>
+                        </tr>
+                    </thead>
+                    <tbody id="hist-empleado-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Tabla de cierres -->
-        <div class="card shadow-sm mb-4">
+        <div id="hist-vista-cierres" class="card shadow-sm mb-4">
             <div class="card-body">
                 <h6 class="card-title mb-3">CIERRES DE PERÍODO</h6>
                 <table id="tabla-historial" class="table table-sm table-hover w-100">
@@ -536,6 +561,7 @@
                     <tbody id="hist-tbody"></tbody>
                 </table>
             </div>
+        </div>
         </div>
 
         <!-- Detalle del cierre seleccionado -->

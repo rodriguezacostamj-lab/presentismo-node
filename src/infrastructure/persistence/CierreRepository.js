@@ -20,6 +20,10 @@ class CierreRepository {
         return this.db.obtenerCierres(filtros)
     }
 
+    async buscarPorEmpleado(filtros) {
+        return this.db.buscarResultadosPorEmpleado(filtros)
+    }
+
     async eliminarCierre(id) {
         return this.db.eliminarCierre(id)
     }

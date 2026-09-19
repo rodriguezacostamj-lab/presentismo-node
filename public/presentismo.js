@@ -698,24 +698,115 @@ let cierreActualId = null
 let resultadosHistorialCache = {}
 
 async function cargarHistorial() {
-    const params = new URLSearchParams()
-    const pres      = document.getElementById('hist-pres').value.trim()
+    const nombre     = document.getElementById('hist-nombre').value.trim()
     const periodoLiq = document.getElementById('hist-periodo-liq').value.trim()
-    const estado    = document.getElementById('hist-estado').value
+    const estado     = document.getElementById('hist-estado').value
+    const params     = new URLSearchParams()
 
-    if (pres)       params.append('pres', pres)
     if (periodoLiq) params.append('periodo_liq', periodoLiq)
     if (estado)     params.append('estado', estado)
 
-    try {
-        const response = await fetch('/api/cierres?' + params.toString())
-        const data = await response.json()
-        if (!response.ok) { alert('Error: ' + data.error); return }
+    document.getElementById('hist-detalle').style.display = 'none'
 
-        renderTablaHistorial(data.cierres)
-        document.getElementById('hist-detalle').style.display = 'none'
-    } catch (error) {
-        alert('Error al cargar historial: ' + error.message)
+    if (nombre) {
+        // Búsqueda por nombre: vista historial del empleado
+        params.append('nombre', nombre)
+        try {
+            const response = await fetch('/api/cierres/buscar?' + params.toString())
+            const data = await response.json()
+            if (!response.ok) { alert('Error: ' + data.error); return }
+            document.getElementById('hist-vista-cierres').style.display = 'none'
+            document.getElementById('hist-vista-empleado').style.display = 'block'
+            renderHistorialEmpleado(data.resultados)
+        } catch (error) {
+            alert('Error al buscar: ' + error.message)
+        }
+    } else {
+        // Búsqueda por período: vista lista de cierres
+        try {
+            const response = await fetch('/api/cierres?' + params.toString())
+            const data = await response.json()
+            if (!response.ok) { alert('Error: ' + data.error); return }
+            document.getElementById('hist-vista-empleado').style.display = 'none'
+            document.getElementById('hist-vista-cierres').style.display = 'block'
+            renderTablaHistorial(data.cierres)
+        } catch (error) {
+            alert('Error al cargar historial: ' + error.message)
+        }
+    }
+}
+
+let tablaHistEmpleado = null
+
+function renderHistorialEmpleado(resultados) {
+    const fmt = v => v != null ? '$' + Number(v).toLocaleString('es-AR') : '—'
+
+    resultadosHistorialCache = {}
+    const filas = resultados.map(r => {
+        resultadosHistorialCache[r.id] = r
+        const premio  = r.detalle?.premio  ?? {}
+        const alertas = r.detalle?.alertas ?? {}
+        return {
+            _id:             r.id,
+            _nombre_raw:     r.nombre_empleado,
+            _obs_raw:        r.observaciones || '',
+            cuil:            r.cuil,
+            nombre_empleado: r.nombre_empleado,
+            periodo_liq:     r.periodo_liquidacion,
+            periodo_pres:    `${formatearFecha(r.periodo_presentismo_desde)} — ${formatearFecha(r.periodo_presentismo_hasta)}`,
+            dias:            r.dias_presentismo,
+            porcentaje:      r.porcentaje_calculado,
+            _fmt_rrhh:       fmt(premio.importe_esperado),
+            _fmt_sueldos:    fmt(premio.importe_rrhh),
+            estado:          premio.estado ?? null,
+            observaciones:   r.observaciones || '',
+        }
+    })
+
+    if (tablaHistEmpleado) { tablaHistEmpleado.destroy(); document.getElementById('hist-empleado-tbody').innerHTML = '' }
+
+    tablaHistEmpleado = $('#tabla-hist-empleado').DataTable({
+        data: filas,
+        columns: [
+            { data: 'cuil' },
+            { data: 'nombre_empleado' },
+            { data: 'periodo_liq' },
+            { data: 'periodo_pres' },
+            { data: 'dias', className: 'text-center' },
+            { data: 'porcentaje', className: 'text-center', render: d => `<strong>${d}%</strong>` },
+            { data: '_fmt_rrhh', type: 'num-fmt' },
+            { data: '_fmt_sueldos', type: 'num-fmt' },
+            {
+                data: 'estado', className: 'text-center',
+                render: d => {
+                    if (d === 'OK')          return '<span class="badge-ok">OK</span>'
+                    if (d === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
+                    if (d === 'NO_EXISTE')   return '<span class="badge-noexiste">No existe</span>'
+                    return '—'
+                }
+            },
+            { data: 'observaciones', render: d => `<span class="text-muted small">${d || '—'}</span>` },
+            {
+                data: null, className: 'text-center', orderable: false,
+                render: (d, t, r) => `
+                    <button class="btn-ver" style="margin-right:3px;"
+                        data-id="${r._id}" onclick="abrirDetalleHistorial(this)">Ver</button>
+                    <button class="btn-ver" style="background-color:#6c757d;"
+                        data-id="${r._id}"
+                        data-nombre="${r._nombre_raw.replace(/"/g, '&quot;')}"
+                        data-obs="${r._obs_raw.replace(/"/g, '&quot;')}"
+                        onclick="abrirModalObservaciones(this)">Obs.</button>`
+            }
+        ],
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+        pageLength: 25,
+        dom: '<"d-flex justify-content-between mb-2"f>rtip',
+        order: [[2, 'desc']]
+    })
+
+    if (filas.length === 0) {
+        document.getElementById('hist-empleado-tbody').innerHTML =
+            '<tr><td colspan="11" class="text-center text-muted small">No se encontraron registros para ese nombre.</td></tr>'
     }
 }
 
