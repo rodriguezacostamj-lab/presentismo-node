@@ -176,16 +176,25 @@
             border-radius: 4px !important;
             border: none !important;
             font-size: 0.75rem !important;
+            color: #6c757d !important;
         }
-        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
             background: #0b1738 !important;
+            background-image: none !important;
             color: white !important;
             border: none !important;
+            border-radius: 4px !important;
         }
-        .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.current) {
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.current):not(.disabled) {
             background: #f0f4f8 !important;
+            background-image: none !important;
             color: #0b1738 !important;
             border: none !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+            color: #ccc !important;
         }
 
         .dt-buttons {

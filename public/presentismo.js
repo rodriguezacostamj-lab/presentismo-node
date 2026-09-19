@@ -25,7 +25,7 @@ function inicializarTabla() {
                     if (r.funcionEjecutiva) badges += '<span class="badge-fe">FE</span> '
                     if (r.cargoMayor) badges += '<span class="badge-cmj">CMJ</span>'
                     if (r.sinAusencias) badges += '<span class="badge-sinausencias">S/Ausencias</span>'
-                    return badges || '—'
+                    return badges || ''
                 }
             },
             {
@@ -939,7 +939,7 @@ function renderResultadosCierre(resultados) {
                     if (r.alertas_fe)  b += '<span class="badge-fe">FE</span> '
                     if (r.alertas_cmj) b += '<span class="badge-cmj">CMJ</span> '
                     if (r.alertas_sin) b += '<span class="badge-sinausencias">S/Ausencias</span>'
-                    return b || '—'
+                    return b || ''
                 }
             },
             { data: '_fmt_rrhh',     orderData: [5], type: 'num-fmt' },
