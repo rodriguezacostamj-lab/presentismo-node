@@ -233,14 +233,18 @@ function formatearFecha(fechaStr) {
     return `${parseInt(dia)}/${parseInt(mes)}/${anio}`
 }
 
+function ocultarTodasSecciones() {
+    ;['seccion-presentismo','seccion-reglas','seccion-historial','seccion-detalle','seccion-especial']
+        .forEach(id => document.getElementById(id).style.display = 'none')
+}
+
 function mostrarSeccionDetalle() {
-    document.getElementById('seccion-presentismo').style.display = 'none'
-    document.getElementById('seccion-reglas').style.display = 'none'
+    ocultarTodasSecciones()
     document.getElementById('seccion-detalle').style.display = 'block'
 }
 
 function volverAlListado() {
-    document.getElementById('seccion-detalle').style.display = 'none'
+    ocultarTodasSecciones()
     document.getElementById('seccion-presentismo').style.display = 'block'
 }
 
@@ -255,10 +259,8 @@ function limpiar() {
 
 // Mostrar sección
 function mostrarSeccion(seccion, el) {
-    document.getElementById('seccion-presentismo').style.display = seccion === 'presentismo' ? 'block' : 'none'
-    document.getElementById('seccion-reglas').style.display = seccion === 'reglas' ? 'block' : 'none'
-    document.getElementById('seccion-historial').style.display = seccion === 'historial' ? 'block' : 'none'
-    document.getElementById('seccion-detalle').style.display = 'none'
+    ocultarTodasSecciones()
+    document.getElementById('seccion-' + seccion).style.display = 'block'
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'))
     el.classList.add('active')
 
@@ -484,9 +486,7 @@ window.abrirReglaEspecial = async function (codigo) {
     bloquesEspecial = data.especial?.bloques ?? []
     renderizarBloques()
 
-    document.getElementById('seccion-presentismo').style.display = 'none'
-    document.getElementById('seccion-reglas').style.display = 'none'
-    document.getElementById('seccion-detalle').style.display = 'none'
+    ocultarTodasSecciones()
     document.getElementById('seccion-especial').style.display = 'block'
 }
 
@@ -620,7 +620,7 @@ async function guardarEspecial() {
 }
 
 function volverAReglas() {
-    document.getElementById('seccion-especial').style.display = 'none'
+    ocultarTodasSecciones()
     document.getElementById('seccion-reglas').style.display = 'block'
     cargarReglas()
 }
