@@ -289,9 +289,9 @@
             background-color: #DDE7EF;
             border-bottom: 1px solid #c4d4df;
             padding: 9px 16px;
-            font-size: 0.72rem;
+            font-size: 0.82rem;
             font-weight: 700;
-            letter-spacing: .07em;
+            letter-spacing: .05em;
             color: #2c3e50;
             text-transform: uppercase;
             border-radius: 0 !important;
@@ -403,8 +403,8 @@
                 <!-- Períodos -->
                 <div class="col-md-8">
                     <div class="card shadow-sm">
-                        <div class="card-body">
-                            <h6 class="card-title mb-3">📅 SELECCIONAR PERÍODOS</h6>
+                        <div class="card-header-hist"><i class="bi bi-calendar-range me-2"></i>Seleccionar Períodos</div>
+                        <div class="card-body pt-3">
                             <div class="mb-3">
                                 <label class="form-label text-muted small">PERÍODO DE PRESENTISMO</label>
                                 <div class="row g-2">
@@ -434,8 +434,8 @@
                 <!-- Archivos -->
                 <div class="col-md-4">
                     <div class="card shadow-sm h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h6 class="card-title mb-3">📁 ARCHIVOS</h6>
+                        <div class="card-header-hist"><i class="bi bi-folder-fill me-2"></i>Archivos</div>
+                        <div class="card-body d-flex flex-column pt-3">
                             <div class="mb-3">
                                 <label class="form-label small">CSV Ausencias <span class="text-danger">*</span></label>
                                 <input type="file" id="archivo-ausencias" class="form-control" accept=".csv">
@@ -455,8 +455,8 @@
 
             <!-- Tabla resultados -->
             <div class="card shadow-sm">
-                <div class="card-header-hist d-flex justify-content-between align-items-center" style="text-transform:none;">
-                    <span style="text-transform:uppercase;font-size:0.72rem;font-weight:700;letter-spacing:.07em;"><i class="bi bi-people-fill me-2"></i>Listado de Agentes</span>
+                <div class="card-header-hist d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-people-fill me-2"></i>Listado de Agentes</span>
                     <div class="d-flex gap-2">
                         <button id="btn-cerrar-periodo" class="btn btn-sm" style="background-color:#0b1738;color:white;font-size:0.75rem;" onclick="cerrarPeriodo()" disabled>
                             Cerrar período
