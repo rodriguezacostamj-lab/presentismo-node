@@ -797,47 +797,85 @@ async function verDetalleCierre(id) {
 }
 
 function renderResultadosCierre(resultados) {
-    const tbody = document.getElementById('hist-resultados-tbody')
-    tbody.innerHTML = ''
+    const fmt = v => v != null ? '$' + Number(v).toLocaleString('es-AR') : '—'
 
-    for (const r of resultados) {
+    const filas = resultados.map(r => {
         const premio  = r.detalle?.premio  ?? {}
         const alertas = r.detalle?.alertas ?? {}
+        return {
+            _id:              r.id,
+            _nombre_raw:      r.nombre_empleado,
+            _obs_raw:         r.observaciones || '',
+            cuil:             r.cuil,
+            nombre_empleado:  r.nombre_empleado,
+            dias_presentismo: r.dias_presentismo,
+            porcentaje:       r.porcentaje_calculado,
+            alertas_fe:       alertas.funcion_ejecutiva,
+            alertas_cmj:      alertas.cargo_mayor,
+            alertas_sin:      alertas.sinAusencias,
+            importe_rrhh:     premio.importe_esperado ?? null,
+            importe_sueldos:  premio.importe_rrhh ?? null,
+            estado:           premio.estado ?? null,
+            observaciones:    r.observaciones || '',
+            _fmt_rrhh:        fmt(premio.importe_esperado),
+            _fmt_sueldos:     fmt(premio.importe_rrhh),
+        }
+    })
 
-        let badgesHtml = ''
-        if (alertas.funcion_ejecutiva) badgesHtml += '<span class="badge-fe">FE</span> '
-        if (alertas.cargo_mayor)       badgesHtml += '<span class="badge-cmj">CMJ</span> '
-        if (alertas.sinAusencias)      badgesHtml += '<span class="badge-sinausencias">S/Ausencias</span>'
-
-        const estadoHtml = premio.estado === 'OK'
-            ? '<span class="badge-ok">OK</span>'
-            : premio.estado === 'NO_COINCIDE'
-                ? '<span class="badge-revisar">Revisar</span>'
-                : premio.estado === 'NO_EXISTE'
-                    ? '<span class="badge-noexiste">No existe</span>'
-                    : '—'
-
-        const fmt = v => v != null ? '$' + Number(v).toLocaleString('es-AR') : '—'
-
-        tbody.innerHTML += `
-            <tr>
-                <td>${r.cuil}</td>
-                <td>${r.nombre_empleado}</td>
-                <td class="text-center">${r.dias_presentismo}</td>
-                <td class="text-center"><strong>${r.porcentaje_calculado}%</strong></td>
-                <td class="text-center">${badgesHtml || '—'}</td>
-                <td>${fmt(premio.importe_esperado)}</td>
-                <td>${fmt(premio.importe_rrhh)}</td>
-                <td class="text-center">${estadoHtml}</td>
-                <td class="text-muted small" style="max-width:180px;white-space:normal;">${r.observaciones || '—'}</td>
-                <td class="text-center"><button class="btn-ver"
-                    data-id="${r.id}"
-                    data-nombre="${r.nombre_empleado.replace(/"/g, '&quot;')}"
-                    data-obs="${(r.observaciones || '').replace(/"/g, '&quot;')}"
-                    onclick="abrirModalObservaciones(this)">Obs.</button></td>
-            </tr>
-        `
+    if (tablaHistResultados) {
+        tablaHistResultados.destroy()
+        document.getElementById('hist-resultados-tbody').innerHTML = ''
     }
+
+    tablaHistResultados = $('#tabla-hist-resultados').DataTable({
+        data: filas,
+        columns: [
+            { data: 'cuil' },
+            { data: 'nombre_empleado' },
+            { data: 'dias_presentismo', className: 'text-center' },
+            {
+                data: 'porcentaje', className: 'text-center',
+                render: d => `<strong>${d}%</strong>`
+            },
+            {
+                data: null, className: 'text-center', orderable: false,
+                render: (d, t, r) => {
+                    let b = ''
+                    if (r.alertas_fe)  b += '<span class="badge-fe">FE</span> '
+                    if (r.alertas_cmj) b += '<span class="badge-cmj">CMJ</span> '
+                    if (r.alertas_sin) b += '<span class="badge-sinausencias">S/Ausencias</span>'
+                    return b || '—'
+                }
+            },
+            { data: '_fmt_rrhh',     orderData: [5], type: 'num-fmt' },
+            { data: '_fmt_sueldos',  orderData: [6], type: 'num-fmt' },
+            {
+                data: 'estado', className: 'text-center',
+                render: d => {
+                    if (d === 'OK')          return '<span class="badge-ok">OK</span>'
+                    if (d === 'NO_COINCIDE') return '<span class="badge-revisar">Revisar</span>'
+                    if (d === 'NO_EXISTE')   return '<span class="badge-noexiste">No existe</span>'
+                    return '—'
+                }
+            },
+            {
+                data: 'observaciones',
+                render: d => `<span class="text-muted small">${d || '—'}</span>`
+            },
+            {
+                data: null, className: 'text-center', orderable: false,
+                render: (d, t, r) => `<button class="btn-ver"
+                    data-id="${r._id}"
+                    data-nombre="${r._nombre_raw.replace(/"/g, '&quot;')}"
+                    data-obs="${r._obs_raw.replace(/"/g, '&quot;')}"
+                    onclick="abrirModalObservaciones(this)">Obs.</button>`
+            }
+        ],
+        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
+        pageLength: 25,
+        dom: '<"d-flex justify-content-between mb-2"f>rtip',
+        order: [[1, 'asc']]
+    })
 }
 
 function toggleReglasAplicadas() {
