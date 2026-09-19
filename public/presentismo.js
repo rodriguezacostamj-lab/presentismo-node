@@ -661,7 +661,15 @@ async function cerrarPeriodo() {
             })
         })
 
-        const data = await response.json()
+        let data
+        try {
+            data = await response.json()
+        } catch {
+            alert(`Error del servidor (${response.status}). El servidor puede estar actualizándose, reintentá en un momento.`)
+            btn.disabled = false
+            btn.textContent = 'Cerrar período'
+            return
+        }
 
         if (!response.ok) {
             alert('Error: ' + data.error)
