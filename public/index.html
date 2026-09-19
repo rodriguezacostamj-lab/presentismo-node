@@ -602,6 +602,84 @@
         </div>
     </div>
 
+    <!-- Modal detalle ausencias (historial) -->
+    <div class="modal fade" id="modalDetalleHistorial" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#1a2035;color:white;">
+                    <h6 class="modal-title">Detalle de ausencias — <span id="mdet-nombre"></span></h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Resumen -->
+                    <div class="row g-2 mb-3" style="font-size:0.85rem;">
+                        <div class="col-auto"><strong>CUIL:</strong> <span id="mdet-cuil"></span></div>
+                        <div class="col-auto"><strong>Días descontables:</strong> <span id="mdet-dias"></span></div>
+                        <div class="col-auto"><strong>%:</strong> <span id="mdet-porcentaje"></span></div>
+                    </div>
+
+                    <!-- Detalle -->
+                    <h6 class="fw-bold mb-2" style="font-size:0.85rem;">DETALLE DE AUSENCIAS PARA EL PRESENTISMO</h6>
+                    <table class="table table-sm table-hover w-100 mb-4">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Ausencia</th>
+                                <th>Cálculo</th>
+                                <th class="text-center">Acumulados previos</th>
+                                <th class="text-center">Días período</th>
+                                <th class="text-center">Tope</th>
+                                <th class="text-center">Días descontables</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mdet-detalle"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="6" class="text-end fw-bold">Total días descontables:</td>
+                                <td class="fw-bold" id="mdet-total"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <!-- Ausencias del período -->
+                    <h6 class="fw-bold mb-2" style="font-size:0.85rem;">AUSENCIAS DEL PERÍODO</h6>
+                    <table class="table table-sm table-hover w-100 mb-4">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nivel</th>
+                                <th>Vínculo</th>
+                                <th>Desde</th>
+                                <th>Hasta</th>
+                                <th class="text-center">Días</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mdet-ausencias-periodo"></tbody>
+                    </table>
+
+                    <!-- Ausencias anteriores -->
+                    <h6 class="fw-bold mb-2" style="font-size:0.85rem;">AUSENCIAS ANTERIORES</h6>
+                    <table class="table table-sm table-hover w-100">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nivel</th>
+                                <th>Vínculo</th>
+                                <th>Desde</th>
+                                <th>Hasta</th>
+                                <th class="text-center">Días</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mdet-ausencias-historicas"></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal observaciones -->
     <div class="modal fade" id="modalObservaciones" tabindex="-1">
         <div class="modal-dialog">

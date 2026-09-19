@@ -695,6 +695,7 @@ async function cerrarPeriodo() {
 let tablaHistorial = null
 let tablaHistResultados = null
 let cierreActualId = null
+let resultadosHistorialCache = {}
 
 async function cargarHistorial() {
     const params = new URLSearchParams()
@@ -799,7 +800,9 @@ async function verDetalleCierre(id) {
 function renderResultadosCierre(resultados) {
     const fmt = v => v != null ? '$' + Number(v).toLocaleString('es-AR') : '—'
 
+    resultadosHistorialCache = {}
     const filas = resultados.map(r => {
+        resultadosHistorialCache[r.id] = r
         const premio  = r.detalle?.premio  ?? {}
         const alertas = r.detalle?.alertas ?? {}
         return {
@@ -864,11 +867,14 @@ function renderResultadosCierre(resultados) {
             },
             {
                 data: null, className: 'text-center', orderable: false,
-                render: (d, t, r) => `<button class="btn-ver"
-                    data-id="${r._id}"
-                    data-nombre="${r._nombre_raw.replace(/"/g, '&quot;')}"
-                    data-obs="${r._obs_raw.replace(/"/g, '&quot;')}"
-                    onclick="abrirModalObservaciones(this)">Obs.</button>`
+                render: (d, t, r) => `
+                    <button class="btn-ver" style="margin-right:3px;"
+                        data-id="${r._id}" onclick="abrirDetalleHistorial(this)">Ver</button>
+                    <button class="btn-ver" style="background-color:#6c757d;"
+                        data-id="${r._id}"
+                        data-nombre="${r._nombre_raw.replace(/"/g, '&quot;')}"
+                        data-obs="${r._obs_raw.replace(/"/g, '&quot;')}"
+                        onclick="abrirModalObservaciones(this)">Obs.</button>`
             }
         ],
         language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
@@ -876,6 +882,58 @@ function renderResultadosCierre(resultados) {
         dom: '<"d-flex justify-content-between mb-2"f>rtip',
         order: [[1, 'asc']]
     })
+}
+
+window.abrirDetalleHistorial = function(btn) {
+    const r = resultadosHistorialCache[btn.dataset.id]
+    if (!r) return
+
+    const resultado = r.detalle?.resultado ?? {}
+
+    document.getElementById('mdet-nombre').textContent    = r.nombre_empleado
+    document.getElementById('mdet-cuil').textContent      = r.cuil
+    document.getElementById('mdet-dias').textContent      = resultado.total_descontables ?? 0
+    document.getElementById('mdet-porcentaje').textContent = (resultado.porcentaje ?? 0) + '%'
+    document.getElementById('mdet-total').textContent     = resultado.total_descontables ?? 0
+
+    // Detalle de ausencias
+    document.getElementById('mdet-detalle').innerHTML = (resultado.detalle ?? []).map(d => `
+        <tr>
+            <td>${d.codigo}</td>
+            <td>${d.nombre}</td>
+            <td><small class="text-muted">${d.explicacion_tope ?? 'Tope general'}</small></td>
+            <td class="text-center">${d.historicos}</td>
+            <td class="text-center">${d.dias}</td>
+            <td class="text-center">${d.tope}</td>
+            <td class="text-center"><strong>${d.descontables}</strong></td>
+        </tr>
+    `).join('') || '<tr><td colspan="7" class="text-muted text-center">Sin detalle</td></tr>'
+
+    // Ausencias del período
+    document.getElementById('mdet-ausencias-periodo').innerHTML = (resultado.ausenciasPeriodo ?? []).map(a => `
+        <tr>
+            <td>${a.codigo}</td>
+            <td>${a.nivel && a.nivel !== 'null' ? a.nivel : ''}</td>
+            <td>${a.vinculo && a.vinculo !== 'null' ? a.vinculo : ''}</td>
+            <td>${formatearFecha(a.fechaDesde)}</td>
+            <td>${formatearFecha(a.fechaHasta)}</td>
+            <td class="text-center">${a.dias}</td>
+        </tr>
+    `).join('') || '<tr><td colspan="6" class="text-muted text-center">Sin ausencias</td></tr>'
+
+    // Ausencias históricas
+    document.getElementById('mdet-ausencias-historicas').innerHTML = (resultado.ausenciasHistoricas ?? []).map(a => `
+        <tr>
+            <td>${a.codigo}</td>
+            <td>${a.nivel && a.nivel !== 'null' ? a.nivel : ''}</td>
+            <td>${a.vinculo && a.vinculo !== 'null' ? a.vinculo : ''}</td>
+            <td>${formatearFecha(a.fechaDesde)}</td>
+            <td>${formatearFecha(a.fechaHasta)}</td>
+            <td class="text-center">${a.dias}</td>
+        </tr>
+    `).join('') || '<tr><td colspan="6" class="text-muted text-center">Sin ausencias anteriores</td></tr>'
+
+    new bootstrap.Modal(document.getElementById('modalDetalleHistorial')).show()
 }
 
 function toggleReglasAplicadas() {
