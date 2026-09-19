@@ -809,9 +809,11 @@ function renderResultadosCierre(resultados) {
                 <td class="text-center"><strong>${r.porcentaje_calculado}%</strong></td>
                 <td>${r.monto != null ? '$' + Number(r.monto).toLocaleString('es-AR') : '—'}</td>
                 <td class="text-muted small" style="max-width:200px;white-space:normal;">${r.observaciones || '—'}</td>
-                <td><button class="btn-ver" onclick="abrirModalObservaciones(${r.id}, '${r.nombre_empleado.replace(/'/g, "\\'")}', ${JSON.stringify(r.observaciones || '')})">
-                    Observaciones
-                </button></td>
+                <td><button class="btn-ver"
+                    data-id="${r.id}"
+                    data-nombre="${r.nombre_empleado.replace(/"/g, '&quot;')}"
+                    data-obs="${(r.observaciones || '').replace(/"/g, '&quot;')}"
+                    onclick="abrirModalObservaciones(this)">Observaciones</button></td>
             </tr>
         `
     }
@@ -822,11 +824,11 @@ function toggleReglasAplicadas() {
     el.style.display = el.style.display === 'none' ? 'block' : 'none'
 }
 
-window.abrirModalObservaciones = function(resultadoId, nombre, obs) {
-    document.getElementById('obs-resultado-id').value = resultadoId
+window.abrirModalObservaciones = function(btn) {
+    document.getElementById('obs-resultado-id').value = btn.dataset.id
     document.getElementById('obs-cierre-id').value = cierreActualId
-    document.getElementById('obs-nombre-empleado').textContent = nombre
-    document.getElementById('obs-texto').value = obs || ''
+    document.getElementById('obs-nombre-empleado').textContent = btn.dataset.nombre
+    document.getElementById('obs-texto').value = btn.dataset.obs || ''
     new bootstrap.Modal(document.getElementById('modalObservaciones')).show()
 }
 
