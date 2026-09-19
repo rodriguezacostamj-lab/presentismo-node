@@ -35,15 +35,27 @@ class CierresController {
 
     async historial(req, res) {
         try {
-            const { desde_pres, hasta_pres, periodo_liq, estado } = req.query
+            const { pres, periodo_liq, estado } = req.query
             const repo = this.#repo()
             const cierres = await repo.obtenerCierres({
-                desdePres: desde_pres || null,
-                hastaPres: hasta_pres || null,
+                pres:       pres       || null,
                 periodoLiq: periodo_liq || null,
-                estado: estado || null
+                estado:     estado     || null
             })
             return res.json({ cierres })
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
+
+    async eliminar(req, res) {
+        try {
+            const id = parseInt(req.params.id)
+            const repo = this.#repo()
+            const cierre = await repo.obtenerCierre(id)
+            if (!cierre) return res.status(404).json({ error: 'Cierre no encontrado.' })
+            await repo.eliminarCierre(id)
+            return res.json({ ok: true })
         } catch (error) {
             return res.status(500).json({ error: error.message })
         }

@@ -699,15 +699,13 @@ let resultadosHistorialCache = {}
 
 async function cargarHistorial() {
     const params = new URLSearchParams()
-    const desdePres = document.getElementById('hist-desde-pres').value
-    const hastaPres = document.getElementById('hist-hasta-pres').value
+    const pres      = document.getElementById('hist-pres').value.trim()
     const periodoLiq = document.getElementById('hist-periodo-liq').value.trim()
-    const estado = document.getElementById('hist-estado').value
+    const estado    = document.getElementById('hist-estado').value
 
-    if (desdePres) params.append('desde_pres', desdePres)
-    if (hastaPres) params.append('hasta_pres', hastaPres)
+    if (pres)       params.append('pres', pres)
     if (periodoLiq) params.append('periodo_liq', periodoLiq)
-    if (estado) params.append('estado', estado)
+    if (estado)     params.append('estado', estado)
 
     try {
         const response = await fetch('/api/cierres?' + params.toString())
@@ -736,7 +734,10 @@ function renderTablaHistorial(cierres) {
                 <td>${formatearFechaHora(c.fecha_cierre)}</td>
                 <td><span class="badge" style="background-color:${badgeColor};color:${c.estado === 'editado' ? 'black' : 'white'};font-size:0.7rem;">${badgeText}</span></td>
                 <td>$${Number(c.valor_premio).toLocaleString('es-AR')}</td>
-                <td><button class="btn-ver" onclick="verDetalleCierre(${c.id})">Ver detalle</button></td>
+                <td>
+                    <button class="btn-ver" style="margin-right:3px;" onclick="verDetalleCierre(${c.id})">Ver detalle</button>
+                    <button class="btn-ver" style="background-color:#dc3545;" onclick="eliminarCierre(${c.id}, '${c.periodo_liquidacion}')">Eliminar</button>
+                </td>
             </tr>
         `
     }
@@ -971,6 +972,20 @@ function formatearFechaHora(str) {
     if (!str) return '—'
     const d = new Date(str)
     return d.toLocaleDateString('es-AR') + ' ' + d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+}
+
+window.eliminarCierre = async function(id, periodoLiq) {
+    if (!confirm(`¿Estás seguro que querés eliminar el cierre del período ${periodoLiq}?\nEsta acción eliminará la cabecera y todos los resultados asociados. No se puede deshacer.`)) return
+
+    try {
+        const response = await fetch(`/api/cierres/${id}`, { method: 'DELETE' })
+        const data = await response.json()
+        if (!response.ok) { alert('Error: ' + data.error); return }
+        document.getElementById('hist-detalle').style.display = 'none'
+        cargarHistorial()
+    } catch (error) {
+        alert('Error al conectar con el servidor: ' + error.message)
+    }
 }
 
 window.verDetalleCierre = verDetalleCierre

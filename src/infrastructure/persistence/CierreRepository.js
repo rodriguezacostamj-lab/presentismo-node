@@ -20,6 +20,10 @@ class CierreRepository {
         return this.db.obtenerCierres(filtros)
     }
 
+    async eliminarCierre(id) {
+        return this.db.eliminarCierre(id)
+    }
+
     async obtenerCierre(id) {
         return this.db.obtenerCierre(id)
     }

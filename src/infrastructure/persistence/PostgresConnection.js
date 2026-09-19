@@ -185,18 +185,14 @@ class PostgresConnection {
         }
     }
 
-    async obtenerCierres({ desdePres, hastaPres, periodoLiq, estado } = {}) {
+    async obtenerCierres({ pres, periodoLiq, estado } = {}) {
         const condiciones = []
         const valores = []
         let idx = 1
 
-        if (desdePres) {
-            condiciones.push(`periodo_presentismo_desde >= $${idx++}`)
-            valores.push(desdePres)
-        }
-        if (hastaPres) {
-            condiciones.push(`periodo_presentismo_hasta <= $${idx++}`)
-            valores.push(hastaPres)
+        if (pres) {
+            condiciones.push(`periodo_presentismo_desde::text LIKE $${idx++}`)
+            valores.push(pres + '%')
         }
         if (periodoLiq) {
             condiciones.push(`periodo_liquidacion = $${idx++}`)
@@ -235,6 +231,11 @@ class PostgresConnection {
             ORDER BY nombre_empleado
         `, [cierreId])
         return rows
+    }
+
+    async eliminarCierre(id) {
+        await this.pool.query(`DELETE FROM resultados_calculo WHERE cierre_id = $1`, [id])
+        await this.pool.query(`DELETE FROM cierres_periodo WHERE id = $1`, [id])
     }
 
     async marcarCierreComoEditado(cierreId) {
