@@ -10,9 +10,11 @@
 
 const { Pool } = require('pg')
 
+const connStr = process.env.DATABASE_URL || ''
+const isLocal = connStr.includes('localhost') || connStr.includes('127.0.0.1')
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
+    connectionString: connStr,
+    ssl: isLocal ? false : { rejectUnauthorized: false }
 })
 
 async function migrar() {

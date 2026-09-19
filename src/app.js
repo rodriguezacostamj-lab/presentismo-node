@@ -4,6 +4,7 @@ const path = require('path')
 const presentismoRoutes = require('./interfaces/routes/presentismo.routes')
 const reglaRoutes = require('./interfaces/routes/reglas.routes')
 const authRoutes = require('./interfaces/routes/auth.routes')
+const cierresRoutes = require('./interfaces/routes/cierres.routes')
 const requireAuth = require('./interfaces/middlewares/authMiddleware')
 
 const app = express()
@@ -33,6 +34,7 @@ app.use('/api/auth', authRoutes)
 // Rutas protegidas
 app.use('/api/presentismo', requireAuth, presentismoRoutes)
 app.use('/api/reglas',      requireAuth, reglaRoutes)
+app.use('/api/cierres',     requireAuth, cierresRoutes)
 
 
 // Ruta raíz

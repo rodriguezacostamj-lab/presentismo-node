@@ -9,9 +9,11 @@ const { Pool } = require('pg')
 class PostgresConnection {
 
     constructor() {
+        const connStr = process.env.DATABASE_URL || ''
+        const isLocal = connStr.includes('localhost') || connStr.includes('127.0.0.1')
         this.pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
-            ssl: { rejectUnauthorized: false }
+            connectionString: connStr,
+            ssl: isLocal ? false : { rejectUnauthorized: false }
         })
     }
 
@@ -136,6 +138,123 @@ class PostgresConnection {
             WHERE usuario = $1 AND activo = true
         `, [usuario])
         return rows[0] ?? null
+    }
+
+    // =============================================
+    // CIERRES DE PERÍODO
+    // =============================================
+
+    async obtenerSnapshotReglas() {
+        const reglas = await this.obtenerReglas()
+        const { rows: especiales } = await this.pool.query(`
+            SELECT codigo, tipo, parametros, activa FROM reglas_especiales
+        `)
+        const { rows: params } = await this.pool.query(`
+            SELECT clave, valor FROM parametros
+        `)
+        const parametros = {}
+        for (const p of params) parametros[p.clave] = p.valor
+        return { reglas, especiales, parametros }
+    }
+
+    async crearCierre({ periodo_presentismo_desde, periodo_presentismo_hasta, periodo_liquidacion, valor_premio, reglas_aplicadas }) {
+        const { rows } = await this.pool.query(`
+            INSERT INTO cierres_periodo
+                (periodo_presentismo_desde, periodo_presentismo_hasta, periodo_liquidacion, valor_premio, reglas_aplicadas)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING id, fecha_cierre
+        `, [periodo_presentismo_desde, periodo_presentismo_hasta, periodo_liquidacion, valor_premio, JSON.stringify(reglas_aplicadas)])
+        return rows[0]
+    }
+
+    async crearResultadosCalculo(cierreId, resultados) {
+        for (const r of resultados) {
+            await this.pool.query(`
+                INSERT INTO resultados_calculo
+                    (cierre_id, cuil, nombre_empleado, dias_presentismo, porcentaje_calculado, monto, detalle)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `, [
+                cierreId,
+                r.cuil,
+                r.nombre_empleado,
+                r.dias_presentismo,
+                r.porcentaje_calculado,
+                r.monto ?? null,
+                JSON.stringify(r.detalle)
+            ])
+        }
+    }
+
+    async obtenerCierres({ desdePres, hastaPres, periodoLiq, estado } = {}) {
+        const condiciones = []
+        const valores = []
+        let idx = 1
+
+        if (desdePres) {
+            condiciones.push(`periodo_presentismo_desde >= $${idx++}`)
+            valores.push(desdePres)
+        }
+        if (hastaPres) {
+            condiciones.push(`periodo_presentismo_hasta <= $${idx++}`)
+            valores.push(hastaPres)
+        }
+        if (periodoLiq) {
+            condiciones.push(`periodo_liquidacion = $${idx++}`)
+            valores.push(periodoLiq)
+        }
+        if (estado) {
+            condiciones.push(`estado = $${idx++}`)
+            valores.push(estado)
+        }
+
+        const where = condiciones.length ? `WHERE ${condiciones.join(' AND ')}` : ''
+        const { rows } = await this.pool.query(`
+            SELECT id, periodo_presentismo_desde, periodo_presentismo_hasta,
+                   periodo_liquidacion, fecha_cierre, estado,
+                   fecha_ultima_edicion, valor_premio
+            FROM cierres_periodo
+            ${where}
+            ORDER BY fecha_cierre DESC
+        `, valores)
+        return rows
+    }
+
+    async obtenerCierre(id) {
+        const { rows } = await this.pool.query(`
+            SELECT * FROM cierres_periodo WHERE id = $1
+        `, [id])
+        return rows[0] ?? null
+    }
+
+    async obtenerResultadosCierre(cierreId) {
+        const { rows } = await this.pool.query(`
+            SELECT id, cuil, nombre_empleado, dias_presentismo,
+                   porcentaje_calculado, monto, detalle, observaciones, created_at
+            FROM resultados_calculo
+            WHERE cierre_id = $1
+            ORDER BY nombre_empleado
+        `, [cierreId])
+        return rows
+    }
+
+    async marcarCierreComoEditado(cierreId) {
+        await this.pool.query(`
+            UPDATE cierres_periodo
+            SET estado = 'editado', fecha_ultima_edicion = NOW()
+            WHERE id = $1
+        `, [cierreId])
+    }
+
+    async actualizarResultadoCalculo(id, campos) {
+        const { observaciones, monto, porcentaje_calculado, dias_presentismo } = campos
+        await this.pool.query(`
+            UPDATE resultados_calculo
+            SET observaciones        = COALESCE($1, observaciones),
+                monto                = COALESCE($2, monto),
+                porcentaje_calculado = COALESCE($3, porcentaje_calculado),
+                dias_presentismo     = COALESCE($4, dias_presentismo)
+            WHERE id = $5
+        `, [observaciones ?? null, monto ?? null, porcentaje_calculado ?? null, dias_presentismo ?? null, id])
     }
 
     // =============================================

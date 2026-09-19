@@ -140,6 +140,7 @@ async function calcular() {
 
 
         tabla.clear().rows.add(filas).draw()
+        document.getElementById('btn-cerrar-periodo').disabled = filas.length === 0
 
     } catch (error) {
         alert('Error al conectar con el servidor: ' + error.message)
@@ -242,19 +243,23 @@ function volverAlListado() {
 // Limpiar
 function limpiar() {
     tabla.clear().draw()
+    resultadosCache = {}
     document.getElementById('archivo-ausencias').value = ''
     document.getElementById('archivo-sueldos').value = ''
+    document.getElementById('btn-cerrar-periodo').disabled = true
 }
 
 // Mostrar sección
 function mostrarSeccion(seccion, el) {
     document.getElementById('seccion-presentismo').style.display = seccion === 'presentismo' ? 'block' : 'none'
     document.getElementById('seccion-reglas').style.display = seccion === 'reglas' ? 'block' : 'none'
+    document.getElementById('seccion-historial').style.display = seccion === 'historial' ? 'block' : 'none'
     document.getElementById('seccion-detalle').style.display = 'none'
     document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'))
     el.classList.add('active')
 
     if (seccion === 'reglas') cargarReglas()
+    if (seccion === 'historial') cargarHistorial()
 }
 
 // Inicializar al cargar
@@ -627,6 +632,203 @@ window.abrirReglaEspecial = abrirReglaEspecial
 window.verDetalle = verDetalle
 window.guardarRegla = guardarRegla
 window.crearRegla = crearRegla
+
+// ================================
+// CERRAR PERÍODO
+// ================================
+
+async function cerrarPeriodo() {
+    const filas = tabla.rows().data().toArray()
+    if (filas.length === 0) return
+
+    if (!confirm(`¿Cerrar el período de liquidación ${formatearFecha(periodosCache.desde_liq)} - ${formatearFecha(periodosCache.hasta_liq)}?\nEsto registrará ${filas.length} agentes con un snapshot de las reglas vigentes.`)) return
+
+    const resultados = Object.values(resultadosCache)
+
+    try {
+        const btn = document.getElementById('btn-cerrar-periodo')
+        btn.disabled = true
+        btn.textContent = 'Guardando...'
+
+        const response = await fetch('/api/cierres', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                resultados,
+                desde_pres: periodosCache.desde_pres,
+                hasta_pres: periodosCache.hasta_pres,
+                desde_liq:  periodosCache.desde_liq
+            })
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+            alert('Error: ' + data.error)
+            btn.disabled = false
+            btn.textContent = 'Cerrar período'
+            return
+        }
+
+        alert(`Período cerrado correctamente. Cierre #${data.cierreId}`)
+        btn.textContent = 'Cerrar período'
+        // El botón queda deshabilitado: el período ya fue cerrado
+    } catch (error) {
+        alert('Error al conectar con el servidor: ' + error.message)
+        document.getElementById('btn-cerrar-periodo').disabled = false
+        document.getElementById('btn-cerrar-periodo').textContent = 'Cerrar período'
+    }
+}
+
+// ================================
+// HISTORIAL
+// ================================
+
+let tablaHistorial = null
+let tablaHistResultados = null
+let cierreActualId = null
+
+async function cargarHistorial() {
+    const params = new URLSearchParams()
+    const desdePres = document.getElementById('hist-desde-pres').value
+    const hastaPres = document.getElementById('hist-hasta-pres').value
+    const periodoLiq = document.getElementById('hist-periodo-liq').value.trim()
+    const estado = document.getElementById('hist-estado').value
+
+    if (desdePres) params.append('desde_pres', desdePres)
+    if (hastaPres) params.append('hasta_pres', hastaPres)
+    if (periodoLiq) params.append('periodo_liq', periodoLiq)
+    if (estado) params.append('estado', estado)
+
+    try {
+        const response = await fetch('/api/cierres?' + params.toString())
+        const data = await response.json()
+        if (!response.ok) { alert('Error: ' + data.error); return }
+
+        renderTablaHistorial(data.cierres)
+        document.getElementById('hist-detalle').style.display = 'none'
+    } catch (error) {
+        alert('Error al cargar historial: ' + error.message)
+    }
+}
+
+function renderTablaHistorial(cierres) {
+    const tbody = document.getElementById('hist-tbody')
+    tbody.innerHTML = ''
+
+    for (const c of cierres) {
+        const badgeColor = c.estado === 'editado' ? '#ffc107' : '#198754'
+        const badgeText = c.estado === 'editado' ? 'Editado' : 'Exportado'
+        tbody.innerHTML += `
+            <tr>
+                <td>${c.id}</td>
+                <td>${formatearFecha(c.periodo_presentismo_desde)} — ${formatearFecha(c.periodo_presentismo_hasta)}</td>
+                <td>${c.periodo_liquidacion}</td>
+                <td>${formatearFechaHora(c.fecha_cierre)}</td>
+                <td><span class="badge" style="background-color:${badgeColor};color:${c.estado === 'editado' ? 'black' : 'white'};font-size:0.7rem;">${badgeText}</span></td>
+                <td>$${Number(c.valor_premio).toLocaleString('es-AR')}</td>
+                <td><button class="btn-ver" onclick="verDetalleCierre(${c.id})">Ver detalle</button></td>
+            </tr>
+        `
+    }
+
+    if (cierres.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted small">No se encontraron cierres.</td></tr>'
+    }
+}
+
+async function verDetalleCierre(id) {
+    try {
+        const response = await fetch(`/api/cierres/${id}`)
+        const data = await response.json()
+        if (!response.ok) { alert('Error: ' + data.error); return }
+
+        cierreActualId = id
+        const c = data.cierre
+
+        document.getElementById('hist-det-pres').textContent =
+            `${formatearFecha(c.periodo_presentismo_desde)} — ${formatearFecha(c.periodo_presentismo_hasta)}`
+        document.getElementById('hist-det-liq').textContent = c.periodo_liquidacion
+        document.getElementById('hist-det-estado').innerHTML =
+            c.estado === 'editado'
+                ? '<span class="badge-revisar">Editado</span>'
+                : '<span class="badge-ok">Exportado</span>'
+        document.getElementById('hist-det-valor').textContent = `$${Number(c.valor_premio).toLocaleString('es-AR')}`
+        document.getElementById('hist-det-fecha').textContent = formatearFechaHora(c.fecha_cierre)
+        document.getElementById('hist-det-edicion').textContent = c.fecha_ultima_edicion ? formatearFechaHora(c.fecha_ultima_edicion) : '—'
+        document.getElementById('hist-reglas-aplicadas').textContent = JSON.stringify(c.reglas_aplicadas, null, 2)
+        document.getElementById('hist-reglas-aplicadas').style.display = 'none'
+
+        renderResultadosCierre(data.resultados)
+
+        document.getElementById('hist-detalle').style.display = 'block'
+        document.getElementById('hist-detalle').scrollIntoView({ behavior: 'smooth', block: 'start' })
+    } catch (error) {
+        alert('Error: ' + error.message)
+    }
+}
+
+function renderResultadosCierre(resultados) {
+    const tbody = document.getElementById('hist-resultados-tbody')
+    tbody.innerHTML = ''
+
+    for (const r of resultados) {
+        tbody.innerHTML += `
+            <tr>
+                <td>${r.cuil}</td>
+                <td>${r.nombre_empleado}</td>
+                <td class="text-center">${r.dias_presentismo}</td>
+                <td class="text-center"><strong>${r.porcentaje_calculado}%</strong></td>
+                <td>${r.monto != null ? '$' + Number(r.monto).toLocaleString('es-AR') : '—'}</td>
+                <td class="text-muted small" style="max-width:200px;white-space:normal;">${r.observaciones || '—'}</td>
+                <td><button class="btn-ver" onclick="abrirModalObservaciones(${r.id}, '${r.nombre_empleado.replace(/'/g, "\\'")}', ${JSON.stringify(r.observaciones || '')})">
+                    Observaciones
+                </button></td>
+            </tr>
+        `
+    }
+}
+
+function toggleReglasAplicadas() {
+    const el = document.getElementById('hist-reglas-aplicadas')
+    el.style.display = el.style.display === 'none' ? 'block' : 'none'
+}
+
+window.abrirModalObservaciones = function(resultadoId, nombre, obs) {
+    document.getElementById('obs-resultado-id').value = resultadoId
+    document.getElementById('obs-cierre-id').value = cierreActualId
+    document.getElementById('obs-nombre-empleado').textContent = nombre
+    document.getElementById('obs-texto').value = obs || ''
+    new bootstrap.Modal(document.getElementById('modalObservaciones')).show()
+}
+
+async function guardarObservaciones() {
+    const resultadoId = document.getElementById('obs-resultado-id').value
+    const cierreId = document.getElementById('obs-cierre-id').value
+    const observaciones = document.getElementById('obs-texto').value.trim()
+
+    const response = await fetch(`/api/cierres/${cierreId}/resultados/${resultadoId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ observaciones: observaciones || null })
+    })
+
+    const data = await response.json()
+    if (!response.ok) { alert('Error: ' + data.error); return }
+
+    bootstrap.Modal.getInstance(document.getElementById('modalObservaciones')).hide()
+    verDetalleCierre(parseInt(cierreId))
+}
+
+function formatearFechaHora(str) {
+    if (!str) return '—'
+    const d = new Date(str)
+    return d.toLocaleDateString('es-AR') + ' ' + d.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+}
+
+window.verDetalleCierre = verDetalleCierre
+window.abrirModalObservaciones = abrirModalObservaciones
+window.cerrarPeriodo = cerrarPeriodo
 
 // ================================
 // AUTH
