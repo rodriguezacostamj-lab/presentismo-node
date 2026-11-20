@@ -883,7 +883,8 @@ async function verDetalleCierre(id) {
         document.getElementById('hist-reglas-aplicadas').style.display = 'none'
 
         renderResultadosCierre(data.resultados)
-
+        cargarRetrosConfirmados(id)
+        
         document.getElementById('hist-detalle').style.display = 'block'
         document.getElementById('hist-detalle').scrollIntoView({ behavior: 'smooth', block: 'start' })
     } catch (error) {
@@ -1076,6 +1077,155 @@ window.eliminarCierre = async function(id, periodoLiq) {
         cargarHistorial()
     } catch (error) {
         alert('Error al conectar con el servidor: ' + error.message)
+    }
+}
+// =============================================
+// RETROACTIVOS
+// =============================================
+
+let retroPropuestas = []
+
+function escHtml(s) {
+    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
+function textoDiferencia(d) {
+    if (d === null || d === undefined) return '<span class="text-muted">Sin importe de sueldos</span>'
+    const n = Number(d)
+    if (n === 0) return '<span class="text-muted">$ 0</span>'
+    return n < 0
+        ? `<span class="text-danger fw-bold">Descontar ${fmtPesos(Math.abs(n))}</span>`
+        : `<span class="text-success fw-bold">Abonar ${fmtPesos(n)}</span>`
+}
+
+window.abrirModalRetro = function() {
+    document.getElementById('retro-periodo').textContent =
+        document.getElementById('hist-det-liq').textContent
+    document.getElementById('retro-archivo').value = ''
+    document.getElementById('retro-resumen').textContent = ''
+    document.getElementById('retro-resultados').style.display = 'none'
+    document.getElementById('retro-btn-confirmar').style.display = 'none'
+    document.getElementById('retro-tbody').innerHTML = ''
+    retroPropuestas = []
+    new bootstrap.Modal(document.getElementById('modalRetro')).show()
+}
+
+window.calcularRetro = async function() {
+    const archivo = document.getElementById('retro-archivo').files[0]
+    if (!archivo) { alert('Seleccioná el CSV de ausencias actualizado.'); return }
+
+    const resumenEl = document.getElementById('retro-resumen')
+    resumenEl.textContent = 'Calculando...'
+
+    try {
+        const fd = new FormData()
+        fd.append('ausencias', archivo)
+        const response = await fetch(`/api/cierres/${cierreActualId}/retros/calcular`, { method: 'POST', body: fd })
+        const data = await response.json()
+        if (!response.ok) { resumenEl.textContent = ''; alert('Error: ' + data.error); return }
+
+        retroPropuestas = data.retros
+        const r = data.resumen
+        let txt = `${r.con_retro} con retro · ${r.sin_cambios} sin cambios · ${r.excluidos_fe} FE excluidos · ${r.sin_ausencias_esperado} sin ausencias`
+        resumenEl.textContent = txt
+        if (r.no_encontrados_revisar.length) {
+            resumenEl.innerHTML = escHtml(txt) + `
+                <div class="alert alert-warning py-2 mt-2 mb-0" style="font-size:0.78rem;">
+                    <strong>Revisar:</strong> ${r.no_encontrados_revisar.length} agente(s) tenían descuento en el cierre y ya no figuran en el CSV
+                    (si una ausencia se eliminó, les correspondería 100%):
+                    ${r.no_encontrados_revisar.map(a => `${escHtml(a.nombre_empleado)} (${a.porcentaje}%)`).join(', ')}
+                </div>`
+        }
+
+        document.getElementById('retro-tbody').innerHTML = retroPropuestas.map((p, i) => {
+            const yaConfirmado = p.monto_pendiente === 0
+            const previo = Number(p.confirmado_previo) !== 0
+                ? `<div class="text-muted" style="font-size:0.7rem;">Ya confirmado: ${fmtPesos(Math.abs(p.confirmado_previo))} · Total: ${fmtPesos(Math.abs(p.diferencia_total))}</div>`
+                : ''
+            return `
+            <tr>
+                <td><input type="checkbox" class="retro-check" data-idx="${i}" ${yaConfirmado ? 'disabled' : 'checked'}></td>
+                <td>${escHtml(p.nombre_empleado)}<div class="text-muted" style="font-size:0.7rem;">${escHtml(p.cuil)}</div></td>
+                <td class="text-center">${p.original.porcentaje}% · ${p.original.dias} d</td>
+                <td class="text-center"><strong>${p.recalculado.porcentaje}% · ${p.recalculado.dias} d</strong></td>
+                <td class="text-end">${p.importe_sueldos === null ? '—' : fmtPesos(p.importe_sueldos)}</td>
+                <td class="text-end">${fmtPesos(p.recalculado.importe)}</td>
+                <td class="text-end">${yaConfirmado ? '<span class="text-muted">Ya confirmado</span>' : textoDiferencia(p.monto_pendiente)}${previo}</td>
+                <td><input type="text" class="form-control form-control-sm retro-obs" data-idx="${i}" placeholder="Opcional"></td>
+            </tr>`
+        }).join('') || '<tr><td colspan="8" class="text-muted text-center">No hay diferencias para este período.</td></tr>'
+
+        document.getElementById('retro-todos').checked = true
+        document.getElementById('retro-resultados').style.display = 'block'
+        document.getElementById('retro-btn-confirmar').style.display = retroPropuestas.length ? 'inline-block' : 'none'
+    } catch (error) {
+        resumenEl.textContent = ''
+        alert('Error al conectar con el servidor: ' + error.message)
+    }
+}
+
+window.toggleRetroTodos = function(chk) {
+    document.querySelectorAll('.retro-check:not(:disabled)').forEach(c => { c.checked = chk.checked })
+}
+
+window.confirmarRetros = async function() {
+    const items = []
+    document.querySelectorAll('.retro-check:checked').forEach(c => {
+        const i = parseInt(c.dataset.idx)
+        const p = retroPropuestas[i]
+        const obs = document.querySelector(`.retro-obs[data-idx="${i}"]`).value.trim()
+        items.push({
+            resultado_id: p.resultado_id,
+            observacion: obs || null,
+            recalculado: p.recalculado,
+            detalle_recalculado: p.detalle_recalculado
+        })
+    })
+    if (!items.length) { alert('No hay retros seleccionados.'); return }
+    if (!confirm(`¿Confirmar ${items.length} retro(s)? Quedan registrados contra este cierre.`)) return
+
+    try {
+        const response = await fetch(`/api/cierres/${cierreActualId}/retros/confirmar`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ retros: items })
+        })
+        const data = await response.json()
+        if (!response.ok) { alert('Error: ' + data.error); return }
+
+        let msg = `Retros guardados: ${data.guardados.length}.`
+        if (data.omitidos.length) msg += `\nOmitidos: ${data.omitidos.length} (${data.omitidos.map(o => o.motivo).join(', ')})`
+        alert(msg)
+
+        bootstrap.Modal.getInstance(document.getElementById('modalRetro')).hide()
+        cargarRetrosConfirmados(cierreActualId)
+    } catch (error) {
+        alert('Error al conectar con el servidor: ' + error.message)
+    }
+}
+
+async function cargarRetrosConfirmados(cierreId) {
+    const card = document.getElementById('hist-retros-card')
+    try {
+        const response = await fetch(`/api/cierres/${cierreId}/retros`)
+        const data = await response.json()
+        if (!response.ok || !data.retros.length) { card.style.display = 'none'; return }
+
+        document.getElementById('hist-retros-tbody').innerHTML = data.retros.map(r => `
+            <tr>
+                <td>${formatearFechaHora(r.created_at)}</td>
+                <td>${escHtml(r.nombre_empleado)}</td>
+                <td class="text-center">${Number(r.porcentaje_original)}%</td>
+                <td class="text-center"><strong>${Number(r.porcentaje_recalculado)}%</strong></td>
+                <td class="text-end">${textoDiferencia(r.diferencia_total)}</td>
+                <td class="text-end">${textoDiferencia(r.monto_pendiente)}</td>
+                <td>${escHtml(r.observacion)}</td>
+                <td>${escHtml(r.usuario)}</td>
+            </tr>`).join('')
+        card.style.display = 'block'
+    } catch (error) {
+        card.style.display = 'none'
     }
 }
 

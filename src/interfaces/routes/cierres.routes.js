@@ -10,5 +10,8 @@ router.get('/buscar',                         (req, res) => controller.buscarEmp
 router.get('/:id',                            (req, res) => controller.detalle(req, res))
 router.delete('/:id',                         (req, res) => controller.eliminar(req, res))
 router.patch('/:id/resultados/:resultadoId',  (req, res) => controller.actualizarResultado(req, res))
+router.post('/:id/retros/calcular',  (req, res) => controller.calcularRetro(req, res))
+router.post('/:id/retros/confirmar', (req, res) => controller.confirmarRetros(req, res))
+router.get('/:id/retros',            (req, res) => controller.listarRetros(req, res))
 
 module.exports = router

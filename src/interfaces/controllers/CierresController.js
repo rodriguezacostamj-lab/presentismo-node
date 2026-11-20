@@ -1,6 +1,10 @@
 const CerrarPeriodoUseCase = require('../../application/CerrarPeriodoUseCase')
 const CierreRepository = require('../../infrastructure/persistence/CierreRepository')
 const PostgresConnection = require('../../infrastructure/persistence/PostgresConnection')
+const CalcularRetroUseCase = require('../../application/CalcularRetroUseCase')
+const ConfirmarRetrosUseCase = require('../../application/ConfirmarRetrosUseCase')
+const path = require('path')
+const fs = require('fs')
 
 class CierresController {
 
@@ -109,6 +113,62 @@ class CierresController {
             await repo.actualizarResultado(resultadoId, campos)
 
             return res.json({ ok: true })
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
+        async calcularRetro(req, res) {
+        let rutaTemp = null
+        try {
+            const cierreId = parseInt(req.params.id)
+
+            if (!req.files?.ausencias) {
+                return res.status(400).json({ error: 'Debe subir el archivo de ausencias actualizado.' })
+            }
+            const archivo = req.files.ausencias
+            if (path.extname(archivo.name).toLowerCase() !== '.csv') {
+                return res.status(400).json({ error: 'El archivo de ausencias debe ser CSV.' })
+            }
+            rutaTemp = archivo.tempFilePath
+
+            const useCase = new CalcularRetroUseCase(this.#repo())
+            const resultado = await useCase.ejecutar({ cierreId, rutaAusencias: rutaTemp })
+            return res.json(resultado)
+        } catch (error) {
+            const status = error.message === 'Cierre no encontrado.' ? 404 : 500
+            return res.status(status).json({ error: error.message })
+        } finally {
+            if (rutaTemp) fs.unlink(rutaTemp, () => {})
+        }
+    }
+
+    async confirmarRetros(req, res) {
+        try {
+            const cierreId = parseInt(req.params.id)
+            const { retros } = req.body
+            if (!Array.isArray(retros) || retros.length === 0) {
+                return res.status(400).json({ error: 'No hay retros para confirmar.' })
+            }
+            const u = req.session?.usuario
+            const usuario = typeof u === 'string' ? u : (u?.nombre ?? u?.usuario ?? null)
+
+            const useCase = new ConfirmarRetrosUseCase(this.#repo())
+            const resultado = await useCase.ejecutar({ cierreId, items: retros, usuario })
+            return res.json(resultado)
+        } catch (error) {
+            const status = error.message === 'Cierre no encontrado.' ? 404 : 500
+            return res.status(status).json({ error: error.message })
+        }
+    }
+
+    async listarRetros(req, res) {
+        try {
+            const cierreId = parseInt(req.params.id)
+            const repo = this.#repo()
+            const cierre = await repo.obtenerCierre(cierreId)
+            if (!cierre) return res.status(404).json({ error: 'Cierre no encontrado.' })
+            const retros = await repo.obtenerRetrosPorCierre(cierreId)
+            return res.json({ retros })
         } catch (error) {
             return res.status(500).json({ error: error.message })
         }

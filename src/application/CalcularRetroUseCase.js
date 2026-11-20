@@ -57,13 +57,28 @@ class CalcularRetroUseCase {
         const recalcPorCuil = new Map(recalculados.map(r => [r.empleado.cuil, r]))
 
         const retros = []
-        const noEncontrados = []
+        const noEncontradosRevisar = []
+        let sinAusenciasEsperado = 0
         let sinCambios = 0
         let excluidosFE = 0
 
         for (const orig of originales) {
             const nuevo = recalcPorCuil.get(orig.cuil)
-            if (!nuevo) { noEncontrados.push(orig.cuil); continue }
+            if (!nuevo) {
+                // Sin ausencias en el CSV nuevo. Si ya estaba en 100% sin días descontables
+                // es lo esperado (agente sin ausencias). Si tenía descuento, hay que revisarlo.
+                if (Number(orig.porcentaje_calculado) < 100 || Number(orig.dias_presentismo) > 0) {
+                    noEncontradosRevisar.push({
+                        cuil: orig.cuil,
+                        nombre_empleado: orig.nombre_empleado,
+                        porcentaje: Number(orig.porcentaje_calculado),
+                        dias: Number(orig.dias_presentismo)
+                    })
+                } else {
+                    sinAusenciasEsperado++
+                }
+                continue
+            }
 
             // Función Ejecutiva no cobra presentismo directo: se excluye
             if (nuevo.empleado.funcionEjecutiva) { excluidosFE++; continue }
@@ -118,7 +133,13 @@ class CalcularRetroUseCase {
                 valor_premio: Number(cierre.valor_premio)
             },
             retros,
-            resumen: { con_retro: retros.length, sin_cambios: sinCambios, excluidos_fe: excluidosFE, no_encontrados: noEncontrados }
+            resumen: {
+                con_retro: retros.length,
+                sin_cambios: sinCambios,
+                excluidos_fe: excluidosFE,
+                sin_ausencias_esperado: sinAusenciasEsperado,
+                no_encontrados_revisar: noEncontradosRevisar
+            }
         }
     }
 }

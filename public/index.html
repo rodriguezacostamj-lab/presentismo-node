@@ -740,6 +740,9 @@
                         <button class="btn btn-sm" style="background-color:#0b1738;color:white;font-size:0.78rem;" onclick="toggleReglasAplicadas()">
                             Ver reglas aplicadas
                         </button>
+                        <button class="btn btn-sm ms-2" id="btn-cargar-retro" style="background-color:#198754;color:white;font-size:0.78rem;" onclick="abrirModalRetro()">
+                        <i class="bi bi-arrow-repeat me-1"></i>Cargar retro
+                        </button>
                         <div id="hist-reglas-aplicadas" style="display:none;" class="mt-2">
                             <table class="table table-sm table-bordered" style="font-size:0.78rem;">
                                 <thead style="background-color:#f0f0f0;">
@@ -777,12 +780,75 @@
                             </tr>
                         </thead>
                         <tbody id="hist-resultados-tbody"></tbody>
+                          </table>
+                </div>
+            </div>
+                                    <div class="card shadow-sm mb-4" id="hist-retros-card" style="display:none">
+                <div class="card-header-hist">Retroactivos confirmados</div>
+                <div class="card-body pt-3">
+                    <table class="table table-sm" style="font-size:0.8rem;">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Agente</th>
+                                <th class="text-center">Original</th>
+                                <th class="text-center">Retro</th>
+                                <th class="text-end">Diferencia total</th>
+                                <th class="text-end">Monto de este retro</th>
+                                <th>Observación</th>
+                                <th>Usuario</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hist-retros-tbody"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-
+    <!-- Modal retroactivos -->
+    <div class="modal fade" id="modalRetro" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#0b1738;color:white;">
+                    <h6 class="modal-title"><i class="bi bi-arrow-repeat me-2"></i>Retroactivos del período <span id="retro-periodo"></span></h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2 align-items-end mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label small mb-1">Reporte de ausencias actualizado (CSV)</label>
+                            <input type="file" id="retro-archivo" class="form-control form-control-sm" accept=".csv">
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-sm w-100" style="background-color:#0b1738;color:white;" onclick="calcularRetro()">Calcular</button>
+                        </div>
+                    </div>
+                    <div id="retro-resumen" class="small text-muted mb-2"></div>
+                    <div id="retro-resultados" style="display:none">
+                        <table class="table table-sm" style="font-size:0.8rem;">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="retro-todos" checked onchange="toggleRetroTodos(this)"></th>
+                                    <th>Agente</th>
+                                    <th class="text-center">Original</th>
+                                    <th class="text-center">Recalculado</th>
+                                    <th class="text-end">$ Sueldos</th>
+                                    <th class="text-end">$ Recalculado</th>
+                                    <th class="text-end">Diferencia</th>
+                                    <th>Observación</th>
+                                </tr>
+                            </thead>
+                            <tbody id="retro-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Descartar</button>
+                    <button id="retro-btn-confirmar" class="btn btn-sm btn-success" style="display:none" onclick="confirmarRetros()">Confirmar seleccionados</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Modal detalle ausencias (historial) -->
     <div class="modal fade" id="modalDetalleHistorial" tabindex="-1">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
