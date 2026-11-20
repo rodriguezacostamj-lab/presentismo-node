@@ -1218,15 +1218,71 @@ async function cargarRetrosConfirmados(cierreId) {
                 <td>${escHtml(r.nombre_empleado)}</td>
                 <td class="text-center">${Number(r.porcentaje_original)}%</td>
                 <td class="text-center"><strong>${Number(r.porcentaje_recalculado)}%</strong></td>
-                <td class="text-end">${textoDiferencia(r.diferencia_total)}</td>
                 <td class="text-end">${textoDiferencia(r.monto_pendiente)}</td>
                 <td>${escHtml(r.observacion)}</td>
                 <td>${escHtml(r.usuario)}</td>
+                <td class="text-center">
+                    <button class="btn-icon btn-icon-secondary" title="Eliminar retro"
+                        onclick="eliminarRetro(${r.id}, '${escHtml(r.nombre_empleado).replace(/'/g, '&#39;')}')"><i class="bi bi-trash"></i></button>
+                </td>
             </tr>`).join('')
         card.style.display = 'block'
     } catch (error) {
         card.style.display = 'none'
     }
+}
+window.eliminarRetro = async function(retroId, nombre) {
+    if (!confirm(`¿Eliminar el retro de ${nombre}?\nEsta acción no se puede deshacer.`)) return
+
+    try {
+        const response = await fetch(`/api/cierres/${cierreActualId}/retros/${retroId}`, { method: 'DELETE' })
+        const data = await response.json()
+        if (!response.ok) { alert(data.error); return }
+        cargarRetrosConfirmados(cierreActualId)
+    } catch (error) {
+        alert('Error al conectar con el servidor: ' + error.message)
+    }
+}
+
+// =============================================
+// EXPORTAR RETROS A EXCEL
+// =============================================
+
+window.abrirModalExportarRetros = async function() {
+    const lista = document.getElementById('exp-retros-lista')
+    const btn = document.getElementById('exp-retros-btn')
+    lista.innerHTML = '<div class="text-muted small">Cargando...</div>'
+    btn.disabled = true
+    new bootstrap.Modal(document.getElementById('modalExportarRetros')).show()
+
+    try {
+        const response = await fetch('/api/cierres/retros/periodos')
+        const data = await response.json()
+        if (!response.ok) { lista.innerHTML = `<div class="text-danger small">${escHtml(data.error)}</div>`; return }
+
+        if (!data.periodos.length) {
+            lista.innerHTML = '<div class="text-muted small">Todavía no hay retros confirmados.</div>'
+            return
+        }
+
+        lista.innerHTML = data.periodos.map(p => `
+            <div class="form-check">
+                <input class="form-check-input exp-retros-check" type="checkbox" id="exp-${p.periodo_liquidacion}" value="${p.periodo_liquidacion}" checked>
+                <label class="form-check-label" for="exp-${p.periodo_liquidacion}">
+                    ${p.periodo_liquidacion} <span class="text-muted small">(${p.cantidad} retro${p.cantidad === 1 ? '' : 's'})</span>
+                </label>
+            </div>`).join('')
+        btn.disabled = false
+    } catch (error) {
+        lista.innerHTML = `<div class="text-danger small">Error: ${escHtml(error.message)}</div>`
+    }
+}
+
+window.descargarRetros = function() {
+    const periodos = [...document.querySelectorAll('.exp-retros-check:checked')].map(c => c.value)
+    if (!periodos.length) { alert('Elegí al menos un período.'); return }
+    window.location.href = `/api/cierres/retros/exportar?periodos=${periodos.join(',')}`
+    bootstrap.Modal.getInstance(document.getElementById('modalExportarRetros')).hide()
 }
 
 window.verDetalleCierre = verDetalleCierre

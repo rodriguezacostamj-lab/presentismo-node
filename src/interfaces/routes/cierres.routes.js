@@ -13,5 +13,8 @@ router.patch('/:id/resultados/:resultadoId',  (req, res) => controller.actualiza
 router.post('/:id/retros/calcular',  (req, res) => controller.calcularRetro(req, res))
 router.post('/:id/retros/confirmar', (req, res) => controller.confirmarRetros(req, res))
 router.get('/:id/retros',            (req, res) => controller.listarRetros(req, res))
+router.get('/retros/periodos', (req, res) => controller.periodosConRetros(req, res))
+router.get('/retros/exportar', (req, res) => controller.exportarRetros(req, res))
+router.delete('/:id/retros/:retroId', (req, res) => controller.eliminarRetro(req, res))
 
 module.exports = router

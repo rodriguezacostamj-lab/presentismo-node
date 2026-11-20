@@ -102,10 +102,20 @@ test('retros previos confirmados se descuentan del pendiente', async () => {
     expect(r.retros[0].monto_pendiente).toBe(-17914.5)
 })
 
-test('empleado del cierre ausente en el CSV nuevo se informa', async () => {
+test('ausente en el CSV y ya estaba en 100% sin días => esperado, no se lista', async () => {
     const { uc } = armar({ originales: [orig(10, '20-9', 100, 0, 1)], recalculados: [] })
     const r = await uc.ejecutar({ cierreId: 1, rutaAusencias: 'a.csv' })
-    expect(r.resumen.no_encontrados).toEqual(['20-9'])
+    expect(r.resumen.sin_ausencias_esperado).toBe(1)
+    expect(r.resumen.no_encontrados_revisar).toEqual([])
+})
+
+test('ausente en el CSV pero tenía descuento => se lista para revisar', async () => {
+    const { uc } = armar({ originales: [orig(10, '20-9', 70, 1, 47825.4)], recalculados: [] })
+    const r = await uc.ejecutar({ cierreId: 1, rutaAusencias: 'a.csv' })
+    expect(r.resumen.sin_ausencias_esperado).toBe(0)
+    expect(r.resumen.no_encontrados_revisar).toEqual([
+        { cuil: '20-9', nombre_empleado: 'Emp 20-9', porcentaje: 70, dias: 1 }
+    ])
 })
 
 test('adapter: valor_premio del cierre pisa el parámetro y sirve reglas', async () => {

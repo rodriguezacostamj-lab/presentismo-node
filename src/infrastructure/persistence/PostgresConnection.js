@@ -267,6 +267,7 @@ class PostgresConnection {
     }
 
     async eliminarCierre(id) {
+        await this.pool.query(`DELETE FROM retros WHERE cierre_id = $1`, [id])
         await this.pool.query(`DELETE FROM resultados_calculo WHERE cierre_id = $1`, [id])
         await this.pool.query(`DELETE FROM cierres_periodo WHERE id = $1`, [id])
     }
@@ -290,7 +291,62 @@ class PostgresConnection {
             WHERE id = $5
         `, [observaciones ?? null, monto ?? null, porcentaje_calculado ?? null, dias_presentismo ?? null, id])
     }
+    
+        // =============================================
+    // RETROS
+    // =============================================
 
+    async obtenerRetrosPorCierre(cierreId) {
+        const { rows } = await this.pool.query(`
+            SELECT * FROM retros WHERE cierre_id = $1 ORDER BY created_at
+        `, [cierreId])
+        return rows
+    }
+
+    async crearRetro(r) {
+        const { rows } = await this.pool.query(`
+            INSERT INTO retros
+                (cierre_id, resultado_id, cuil, nombre_empleado,
+                 porcentaje_original, dias_original, importe_sueldos,
+                 porcentaje_recalculado, dias_recalculado, importe_recalculado,
+                 diferencia_total, monto_pendiente, detalle_recalculado,
+                 observacion, usuario)
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+            RETURNING id
+        `, [r.cierre_id, r.resultado_id, r.cuil, r.nombre_empleado,
+            r.porcentaje_original, r.dias_original, r.importe_sueldos,
+            r.porcentaje_recalculado, r.dias_recalculado, r.importe_recalculado,
+            r.diferencia_total, r.monto_pendiente, JSON.stringify(r.detalle_recalculado),
+            r.observacion ?? null, r.usuario ?? null])
+        return rows[0]
+    }
+    
+        async obtenerPeriodosConRetros() {
+        const { rows } = await this.pool.query(`
+            SELECT cp.periodo_liquidacion, COUNT(*)::int AS cantidad
+            FROM retros r
+            JOIN cierres_periodo cp ON cp.id = r.cierre_id
+            GROUP BY cp.periodo_liquidacion
+            ORDER BY cp.periodo_liquidacion DESC
+        `)
+        return rows
+    }
+
+    async obtenerRetrosParaExportar(periodos) {
+        const { rows } = await this.pool.query(`
+            SELECT r.cuil, r.nombre_empleado, r.porcentaje_recalculado,
+                   r.monto_pendiente, cp.periodo_liquidacion
+            FROM retros r
+            JOIN cierres_periodo cp ON cp.id = r.cierre_id
+            WHERE cp.periodo_liquidacion = ANY($1)
+            ORDER BY cp.periodo_liquidacion, r.nombre_empleado
+        `, [periodos])
+        return rows
+    }
+
+        async eliminarRetro(id) {
+        await this.pool.query(`DELETE FROM retros WHERE id = $1`, [id])
+    }
     // =============================================
     // CERRAR (no-op en Postgres, el pool se maneja solo)
     // =============================================
@@ -299,6 +355,7 @@ class PostgresConnection {
         // El pool de pg se mantiene abierto entre requests.
         // Solo se cierra al terminar el proceso.
     }
+    
 }
 
 module.exports = PostgresConnection

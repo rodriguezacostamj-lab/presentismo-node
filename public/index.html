@@ -625,8 +625,11 @@
     
     <!-- SECCIÓN HISTORIAL -->
     <div id="seccion-historial" style="display:none">
-        <div class="page-title">
+                <div class="page-title d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Historial de Cierres</h5>
+            <button class="btn btn-sm btn-success" onclick="abrirModalExportarRetros()">
+                <i class="bi bi-file-earmark-excel me-1"></i>Exportar retros
+            </button>
         </div>
 
         <!-- Filtros -->
@@ -793,14 +796,35 @@
                                 <th>Agente</th>
                                 <th class="text-center">Original</th>
                                 <th class="text-center">Retro</th>
-                                <th class="text-end">Diferencia total</th>
-                                <th class="text-end">Monto de este retro</th>
+                                <th class="text-end">Monto Retro</th>
                                 <th>Observación</th>
                                 <th>Usuario</th>
+                                <th class="text-center">Acción</th>
                             </tr>
                         </thead>
                         <tbody id="hist-retros-tbody"></tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+        <!-- Modal exportar retros -->
+    <div class="modal fade" id="modalExportarRetros" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#0b1738;color:white;">
+                    <h6 class="modal-title"><i class="bi bi-file-earmark-excel me-2"></i>Exportar retros a Excel</h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="small text-muted mb-2">Elegí los períodos de liquidación que querés incluir:</p>
+                    <div id="exp-retros-lista"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button id="exp-retros-btn" class="btn btn-sm btn-success" onclick="descargarRetros()">
+                        <i class="bi bi-download me-1"></i>Descargar Excel
+                    </button>
                 </div>
             </div>
         </div>

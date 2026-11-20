@@ -43,6 +43,21 @@ class CierreRepository {
     async actualizarResultado(id, campos) {
         return this.db.actualizarResultadoCalculo(id, campos)
     }
+    async obtenerRetrosPorCierre(cierreId) {
+         return this.db.obtenerRetrosPorCierre(cierreId) }
+
+    async crearRetro(datos) { 
+        return this.db.crearRetro(datos) }
+        async obtenerPeriodosConRetros() {
+        return this.db.obtenerPeriodosConRetros()
+    }
+
+    async obtenerRetrosParaExportar(periodos) {
+        return this.db.obtenerRetrosParaExportar(periodos)
+    }
+        async eliminarRetro(id) {
+        return this.db.eliminarRetro(id)
+    }
 }
 
 module.exports = CierreRepository

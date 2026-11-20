@@ -5,6 +5,8 @@ const CalcularRetroUseCase = require('../../application/CalcularRetroUseCase')
 const ConfirmarRetrosUseCase = require('../../application/ConfirmarRetrosUseCase')
 const path = require('path')
 const fs = require('fs')
+const ExportadorRetros = require('../../infrastructure/exporters/ExportadorRetros')
+const EliminarRetroUseCase = require('../../application/EliminarRetroUseCase')
 
 class CierresController {
 
@@ -171,6 +173,52 @@ class CierresController {
             return res.json({ retros })
         } catch (error) {
             return res.status(500).json({ error: error.message })
+        }  
+    }
+        async periodosConRetros(req, res) {
+        try {
+            const periodos = await this.#repo().obtenerPeriodosConRetros()
+            return res.json({ periodos })
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
+
+    async exportarRetros(req, res) {
+        try {
+            const periodos = String(req.query.periodos ?? '')
+                .split(',')
+                .map(p => p.trim())
+                .filter(p => /^\d{4}-\d{2}$/.test(p))
+
+            if (periodos.length === 0) {
+                return res.status(400).json({ error: 'Elegí al menos un período.' })
+            }
+
+            const filas = await this.#repo().obtenerRetrosParaExportar(periodos)
+            if (filas.length === 0) {
+                return res.status(404).json({ error: 'No hay retros confirmados en los períodos elegidos.' })
+            }
+
+            const buffer = await new ExportadorRetros().generar(filas)
+            const nombre = `retros_${periodos.join('_')}.xlsx`
+
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            res.setHeader('Content-Disposition', `attachment; filename="${nombre}"`)
+            return res.send(buffer)
+        } catch (error) {
+            return res.status(500).json({ error: error.message })
+        }
+    }
+        async eliminarRetro(req, res) {
+        try {
+            const cierreId = parseInt(req.params.id)
+            const retroId = parseInt(req.params.retroId)
+            const useCase = new EliminarRetroUseCase(this.#repo())
+            const resultado = await useCase.ejecutar({ cierreId, retroId })
+            return res.json(resultado)
+        } catch (error) {
+            return res.status(error.status ?? 500).json({ error: error.message })
         }
     }
 }
