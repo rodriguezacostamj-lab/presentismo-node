@@ -808,6 +808,48 @@
             </div>
         </div>
     </div>
+        <!-- Modal detalle de retro -->
+    <div class="modal fade" id="modalDetalleRetro" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color:#0b1738;color:white;">
+                    <h6 class="modal-title"><i class="bi bi-arrow-repeat me-2"></i>Detalle del retro — <span id="dret-nombre"></span> <small class="opacity-75" id="dret-cuil"></small></h6>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3"><div class="hist-card-label">Original</div><div class="hist-card-value" id="dret-original"></div></div>
+                        <div class="col-md-3"><div class="hist-card-label">Recalculado</div><div class="hist-card-value" id="dret-recalculado"></div></div>
+                        <div class="col-md-2"><div class="hist-card-label">$ Sueldos</div><div class="hist-card-value" id="dret-sueldos"></div></div>
+                        <div class="col-md-2"><div class="hist-card-label">$ Recalculado</div><div class="hist-card-value" id="dret-importe"></div></div>
+                        <div class="col-md-2"><div class="hist-card-label">Monto del retro</div><div class="hist-card-value" id="dret-monto"></div></div>
+                    </div>
+                    <div class="small text-muted mb-3" id="dret-meta"></div>
+
+                    <h6 class="mt-3">Ausencias del período</h6>
+                    <table class="table table-sm" style="font-size:0.8rem;">
+                        <thead><tr><th>Código</th><th>Nivel</th><th>Vínculo</th><th>Desde</th><th>Hasta</th><th class="text-center">Días</th><th>Cambio</th></tr></thead>
+                        <tbody id="dret-ausencias-periodo"></tbody>
+                    </table>
+
+                    <h6 class="mt-3">Ausencias anteriores</h6>
+                    <table class="table table-sm" style="font-size:0.8rem;">
+                        <thead><tr><th>Código</th><th>Nivel</th><th>Vínculo</th><th>Desde</th><th>Hasta</th><th class="text-center">Días</th><th>Cambio</th></tr></thead>
+                        <tbody id="dret-ausencias-historicas"></tbody>
+                    </table>
+
+                    <h6 class="mt-3">Detalle de descuento (recalculado)</h6>
+                    <table class="table table-sm" style="font-size:0.8rem;">
+                        <thead><tr><th>Código</th><th>Ausencia</th><th>Regla</th><th class="text-center">Históricos</th><th class="text-center">Días</th><th class="text-center">Tope</th><th class="text-center">Descontables</th></tr></thead>
+                        <tbody id="dret-detalle"></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
         <!-- Modal exportar retros -->
     <div class="modal fade" id="modalExportarRetros" tabindex="-1">
         <div class="modal-dialog">
