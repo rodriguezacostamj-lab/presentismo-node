@@ -1211,6 +1211,9 @@ async function cargarRetrosConfirmados(cierreId) {
         const response = await fetch(`/api/cierres/${cierreId}/retros`)
         const data = await response.json()
         if (!response.ok || !data.retros.length) { card.style.display = 'none'; return }
+        
+        retrosConfirmadosCache = {}
+        data.retros.forEach(r => { retrosConfirmadosCache[r.id] = r })
 
         document.getElementById('hist-retros-tbody').innerHTML = data.retros.map(r => `
             <tr>
@@ -1222,6 +1225,7 @@ async function cargarRetrosConfirmados(cierreId) {
                 <td>${escHtml(r.observacion)}</td>
                 <td>${escHtml(r.usuario)}</td>
                 <td class="text-center">
+                    <button class="btn-icon btn-icon-primary me-1" title="Ver detalle" onclick="abrirDetalleRetro(${r.id})"><i class="bi bi-eye"></i></button>
                     <button class="btn-icon btn-icon-secondary" title="Eliminar retro"
                         onclick="eliminarRetro(${r.id}, '${escHtml(r.nombre_empleado).replace(/'/g, '&#39;')}')"><i class="bi bi-trash"></i></button>
                 </td>
@@ -1331,4 +1335,81 @@ async function iniciarSesion() {
 async function cerrarSesion() {
     await fetch('/api/auth/logout', { method: 'POST' })
     document.getElementById('pantalla-login').style.display = 'flex'
+}
+
+// =============================================
+// DETALLE DE RETRO
+// =============================================
+
+let retrosConfirmadosCache = {}
+
+// Dos ausencias son "la misma" si coinciden código y fechas
+const claveAusencia = a => `${a.codigo}|${String(a.fechaDesde).slice(0, 10)}|${String(a.fechaHasta).slice(0, 10)}`
+
+function filasAusenciasRetro(nuevas, originales) {
+    const setOrig = new Set(originales.map(claveAusencia))
+    const setNuevas = new Set(nuevas.map(claveAusencia))
+
+    const items = [
+        ...nuevas.map(a => ({ a, estado: setOrig.has(claveAusencia(a)) ? 'igual' : 'nueva' })),
+        ...originales.filter(a => !setNuevas.has(claveAusencia(a))).map(a => ({ a, estado: 'quitada' }))
+    ].sort((x, y) => String(x.a.fechaDesde).localeCompare(String(y.a.fechaDesde)))
+
+    if (!items.length) return '<tr><td colspan="7" class="text-muted text-center">Sin ausencias</td></tr>'
+
+    return items.map(({ a, estado }) => {
+        const clase = estado === 'nueva' ? 'table-warning' : estado === 'quitada' ? 'table-danger text-decoration-line-through' : ''
+        const badge = estado === 'nueva' ? '<span class="badge bg-warning text-dark">Nueva</span>'
+            : estado === 'quitada' ? '<span class="badge bg-danger">Ya no figura</span>'
+            : '<span class="text-muted small">Sin cambios</span>'
+        return `
+        <tr class="${clase}">
+            <td>${escHtml(a.codigo)}</td>
+            <td>${a.nivel && a.nivel !== 'null' ? escHtml(a.nivel) : ''}</td>
+            <td>${a.vinculo && a.vinculo !== 'null' ? escHtml(a.vinculo) : ''}</td>
+            <td>${formatearFecha(a.fechaDesde)}</td>
+            <td>${formatearFecha(a.fechaHasta)}</td>
+            <td class="text-center">${a.dias}</td>
+            <td class="text-decoration-none">${badge}</td>
+        </tr>`
+    }).join('')
+}
+
+window.abrirDetalleRetro = function(retroId) {
+    const r = retrosConfirmadosCache[retroId]
+    if (!r) return
+
+    const det = typeof r.detalle_recalculado === 'string' ? JSON.parse(r.detalle_recalculado) : (r.detalle_recalculado ?? {})
+    const nuevo = det.resultado ?? {}
+    const orig = resultadosHistorialCache[r.resultado_id]
+    const original = orig?.detalle?.resultado ?? {}
+
+    document.getElementById('dret-nombre').textContent = r.nombre_empleado
+    document.getElementById('dret-cuil').textContent = r.cuil
+    document.getElementById('dret-original').textContent = `${Number(r.porcentaje_original)}% · ${r.dias_original} d`
+    document.getElementById('dret-recalculado').textContent = `${Number(r.porcentaje_recalculado)}% · ${r.dias_recalculado} d`
+    document.getElementById('dret-sueldos').textContent = r.importe_sueldos === null ? '—' : fmtPesos(r.importe_sueldos)
+    document.getElementById('dret-importe').textContent = fmtPesos(r.importe_recalculado)
+    document.getElementById('dret-monto').innerHTML = textoDiferencia(r.monto_pendiente)
+    document.getElementById('dret-meta').textContent =
+        `Confirmado el ${formatearFechaHora(r.created_at)} por ${r.usuario ?? '—'}` +
+        (r.observacion ? ` · Observación: ${r.observacion}` : '')
+
+    document.getElementById('dret-ausencias-periodo').innerHTML =
+        filasAusenciasRetro(nuevo.ausenciasPeriodo ?? [], original.ausenciasPeriodo ?? [])
+    document.getElementById('dret-ausencias-historicas').innerHTML =
+        filasAusenciasRetro(nuevo.ausenciasHistoricas ?? [], original.ausenciasHistoricas ?? [])
+
+    document.getElementById('dret-detalle').innerHTML = (nuevo.detalle ?? []).map(d => `
+        <tr>
+            <td>${escHtml(d.codigo)}</td>
+            <td>${escHtml(d.nombre)}</td>
+            <td><small class="text-muted">${escHtml(d.explicacion_tope ?? 'Tope general')}</small></td>
+            <td class="text-center">${d.historicos}</td>
+            <td class="text-center">${d.dias}</td>
+            <td class="text-center">${d.tope}</td>
+            <td class="text-center"><strong>${d.descontables}</strong></td>
+        </tr>`).join('') || '<tr><td colspan="7" class="text-muted text-center">Sin detalle</td></tr>'
+
+    new bootstrap.Modal(document.getElementById('modalDetalleRetro')).show()
 }
